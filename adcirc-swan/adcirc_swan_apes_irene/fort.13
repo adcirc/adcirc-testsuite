@@ -1,0 +1,27 @@
+Spatial attributes description
+1069
+4
+sea_surface_height_above_geoid
+ m
+ 1
+ 0.000000
+primitive_weighting_in_continuity_equation
+ 1
+ 1
+ 0.030000
+mannings_n_at_sea_floor
+ m
+ 1
+ 0.012000
+average_horizontal_eddy_viscosity_in_sea_water_wrt_depth
+ m2/s
+ 1
+ 4.0
+sea_surface_height_above_geoid
+ 0
+primitive_weighting_in_continuity_equation
+ 0
+mannings_n_at_sea_floor
+ 0
+average_horizontal_eddy_viscosity_in_sea_water_wrt_depth
+ 0

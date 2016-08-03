@@ -1,14 +1,20 @@
 #!/bin/bash
 
 #...List of ADCIRC's test cases. Cases are named by their directory tree
-case_list=( adcirc/adcirc_quarterannular-2d          \
-            adcirc/adcirc_quarterannular-2d-parallel \
-            adcirc/adcirc_shinnecock_inlet           \
-            adcirc/adcirc_shinnecock_inlet-parallel  \
-            adcirc/adcirc_internal_overflow          \
-            adcirc/adcirc_internal_overflow-parallel \
-            adcirc/adcirc_apes                       \
-            adcirc/adcirc_apes-parallel              )
+case_list=( adcirc/adcirc_apes                                       \
+            adcirc/adcirc_apes-parallel                              \
+            adcirc/adcirc_internal_overflow                          \
+            adcirc/adcirc_internal_overflow-parallel                 \
+            adcirc/adcirc_quarterannular-2d                          \
+            adcirc/adcirc_quarterannular-2d-netcdf                   \
+            adcirc/adcirc_quarterannular-2d-parallel                 \
+            adcirc/adcirc_quarterannular-2d-parallel-netcdf          \
+            adcirc/adcirc_quarterannular-2d-parallel-netcdf-writer   \
+            adcirc/adcirc_quarterannular-2d-parallel-writer          \
+            adcirc/adcirc_shinnecock_inlet                           \
+            adcirc/adcirc_shinnecock_inlet-parallel                  \
+            adcirc-swan/adcirc_swan_apes_irene                       \
+            adcirc-swan/adcirc_swan_apes_irene-parallel              )
 
 #...Maximum Absoloute Error
 abserr=0.00001
@@ -23,6 +29,8 @@ adcirc_path=$1
 ODIR_adcirc=$adcirc_path/odir3
 ODIR_padcirc=$adcirc_path/odir4
 ODIR_adcprep=$adcirc_path/odir1
+ODIR_adcswan=$adcirc_path/odir33
+ODIR_padcswan=$adcirc_path/odir44
 
 #...Current home location
 TESTHOME=$(pwd)
@@ -60,6 +68,18 @@ fi
 #...Check of adccmp exists
 if [ ! -s $1/adccmp ] ; then
     echo "ERROR: adccmp executable not found."
+    exit 1
+fi
+
+#...Check if adcswan exists
+if [ ! -s $1/adcswan ] ; then
+    echo "ERROR: adcswan executable not found."
+    exit 1
+fi
+
+#...Check if padcswan exists
+if [ ! -s $1/padcswan ] ; then
+    echo "ERROR: padcswan executable not found."
     exit 1
 fi
 
@@ -104,6 +124,12 @@ if [ "x$coverage" == "x1" ] ; then
     echo ""
     echo "Generating PADCIRC Coverage Report..."
     ./GenerateCoverageReport.sh PADCIRC $ODIR_padcirc
+    echo ""
+    echo "Generating ADCSWAN Coverage Report..."
+    ./GenerateCoverageReport.sh ADCSWAN $ODIR_adcswan
+    echo ""
+    echo "Generating PADCSWAN Coverage Report..."
+    ./GenerateCoverageReport.sh PADCSWAN $ODIR_padcswan
 fi
     
 
