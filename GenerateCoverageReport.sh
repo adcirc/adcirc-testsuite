@@ -36,17 +36,17 @@ do
         execLines=$(echo "$execLines + $execd" | bc)
         totalLines=$(echo "$totalLines + $lines" | bc)
         
-        ps=$(printf "%18.18s" $percent)
+        ps=$(printf "%17.17s" $percent)
         le=$(printf "%14.14s" $execd)
         ln=$(printf "%13.13s" $lines)
         fl=$(printf "%30.30s" $file)
-        echo "| $fl | $ln | $le | $ps |"
+        echo "| $fl | $ln | $le | $ps% |"
     fi
 done
 echo "|--------------------------------------------------------------------------------------|"
 el=$(printf "%8.8s" $execLines)
 tl=$(printf "%8.8s" $totalLines)
-tc=$(echo "scale=2;$el/$tl" | bc)
+tc=$(echo "scale=4;($el/$tl)*100" | bc)
 tp=$(printf "%0.2f" $tc)
 tp=$(printf "%8.8s" $tp)
 echo "  Total Lines Executed: $el"
