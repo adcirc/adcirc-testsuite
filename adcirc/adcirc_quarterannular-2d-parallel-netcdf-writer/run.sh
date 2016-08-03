@@ -1,6 +1,6 @@
 #!/bin/bash
 
-case_name="quarter_annular-2d-parallel-writer"
+case_name="quarter_annular-2d-parallel-netcdf-writer"
 
 #...Check on what is provided
 if [ $# -ne 3 ] ; then
