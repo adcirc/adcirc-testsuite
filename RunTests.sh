@@ -6,8 +6,10 @@ case_list=( adcirc/adcirc_apes                                       \
             adcirc/adcirc_internal_overflow                          \
             adcirc/adcirc_internal_overflow-parallel                 \
             adcirc/adcirc_quarterannular-2d                          \
+            adcirc/adcirc_quarterannular-3d                          \
             adcirc/adcirc_quarterannular-2d-netcdf                   \
             adcirc/adcirc_quarterannular-2d-parallel                 \
+            adcirc/adcirc_quarterannular-3d-parallel                 \
             adcirc/adcirc_quarterannular-2d-parallel-netcdf          \
             adcirc/adcirc_quarterannular-2d-parallel-netcdf-writer   \
             adcirc/adcirc_quarterannular-2d-parallel-writer          \
