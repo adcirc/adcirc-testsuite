@@ -27,7 +27,7 @@ $exepath/adcprep --np 2 --partmesh >  adcprep.log
 $exepath/adcprep --np 2 --prepall  >> adcprep.log
 echo "done!"
 echo -n "    Runnning case..."
-mpirun -np 3 $exepath/padcirc -W 1 > padcirc_log.txt
+mpirun --allow-run-as-root -np 3 $exepath/padcirc -W 1 > padcirc_log.txt
 exitstat=$?
 echo "Finished"
 echo "    PADCIRC Exit Code: $exitstat"

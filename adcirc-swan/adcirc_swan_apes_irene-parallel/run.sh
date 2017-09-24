@@ -27,7 +27,7 @@ $exepath/adcprep --np 2 --partmesh >  adcprep.log
 $exepath/adcprep --np 2 --prepall  >> adcprep.log
 echo "done!"
 echo -n "    Runnning case..."
-mpirun -np 2 $exepath/padcswan > padcswan_log.txt
+mpirun --allow-run-as-root -np 2 $exepath/padcswan > padcswan_log.txt
 exitstat=$?
 echo "Finished"
 echo "    PADCIRC Exit Code: $exitstat"
