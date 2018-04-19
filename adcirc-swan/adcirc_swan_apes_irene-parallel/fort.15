@@ -51,3 +51,4 @@ average_horizontal_eddy_viscosity_in_sea_water_wrt_depth
  0 86400                   ! NHSTAR,NHSINC
  1 0 1e-5 25               ! ITITER,ISLDIA,CONVCR,ITMAX
 &metControl WindDragLimit=0.002 DragLawString='Powell' /
+&SWANOutputControl SWAN_OutputTPS=T, SWAN_OutputTMM10=T, SWAN_OutputTM01=T, SWAN_OutputHS=T, SWAN_OutputTM02=T SWAN_OutputDIR=T /
