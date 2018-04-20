@@ -1,6 +1,6 @@
 #!/bin/bash
 
-case_name="adcirc_apes-parallel"
+case_name="adcirc_swan_apes_irene-parallel"
 
 #...Check on what is provided
 if [ $# -ne 2 ] ; then
