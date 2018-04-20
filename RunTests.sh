@@ -6,10 +6,8 @@ case_list=( adcirc/adcirc_apes                                       \
             adcirc/adcirc_internal_overflow                          \
             adcirc/adcirc_internal_overflow-parallel                 \
             adcirc/adcirc_quarterannular-2d                          \
-            adcirc/adcirc_quarterannular-3d                          \
             adcirc/adcirc_quarterannular-2d-netcdf                   \
             adcirc/adcirc_quarterannular-2d-parallel                 \
-            adcirc/adcirc_quarterannular-3d-parallel                 \
             adcirc/adcirc_quarterannular-2d-parallel-netcdf          \
             adcirc/adcirc_quarterannular-2d-parallel-netcdf-writer   \
             adcirc/adcirc_quarterannular-2d-parallel-writer          \
@@ -18,11 +16,8 @@ case_list=( adcirc/adcirc_apes                                       \
             adcirc-swan/adcirc_swan_apes_irene                       \
             adcirc-swan/adcirc_swan_apes_irene-parallel              )
 
-#...Maximum Absoloute Error
-abserr=0.00001
-
-#...Maximum Relative Error
-relerr=0.00001
+#...Maximum Error
+err=0.00001
 
 #...Path to the executables
 adcirc_path=$1
@@ -68,8 +63,8 @@ if [ ! -s $1/padcirc ] ; then
 fi
 
 #...Check of adccmp exists
-if [ ! -s $1/adccmp ] ; then
-    echo "ERROR: adccmp executable not found."
+if [ ! -s $1/adcircResultsComparison ] ; then
+    echo "ERROR: adcircResultsComparison executable not found."
     exit 1
 fi
 
@@ -106,7 +101,7 @@ do
     fi
     
     #...Run the case and check the return status
-    ./run.sh $adcirc_path $abserr $relerr 2>/dev/null
+    ./run.sh $adcirc_path $err 2>/dev/null
     if [ $? -ne 0 ] ; then
         echo "ERROR: The case $CASE did not pass."
         exit 1
