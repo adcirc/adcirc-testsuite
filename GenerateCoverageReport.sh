@@ -17,6 +17,8 @@ if [ "x$genhtmlexe" == "x" ] ; then
     exit 1
 fi
 
+versionString=$(git --git-dir $1/../.git --work-tree $1/../ describe --always --tags)
+
 basedir=$1/CMakeFiles
 dirs=("adccmp.dir adcirc.dir" "adcircResultsComparison.dir" "adcprep.dir" "adcswan.dir" \
       "aswip.dir build13.dir" "buildstwave23.dir" "hot2asc.dir" "hstime.dir" "inflate.dir" \
@@ -35,7 +37,7 @@ echo "Processing coverage files..."
 testString=""
 for DIR in ${dirs[@]}
 do
-    $lcovexe -t "adcircTestSuite" -o $DIR.info -c -d $basedir/$DIR > stat.txt 2>stat.txt
+    $lcovexe -t "adcirc_$versionString" -o $DIR.info -c -d $basedir/$DIR > stat.txt 2>stat.txt
     n=$(grep "skipping" stat.txt | wc -l)
     if [ "x$n" == "x0" ] ; then
         testString="$testString -a $DIR.info" 
@@ -44,8 +46,8 @@ done
     
 #...Merge data in lcov 
 echo "Merging coverage files..."
-$lcovexe $testString -o adcirc_full.info >/dev/null 2>/dev/null 
+$lcovexe $testString -o adcirc_$versionString.info >/dev/null 2>/dev/null 
 
 #...Generate the HTML
 echo "Generating webpage..."
-$genhtmlexe --legend --num-spaces 4 -f -o adcirc adcirc_full.info >/dev/null 2>/dev/null
+$genhtmlexe --legend --num-spaces 4 -f -o adcirc adcirc_$versionString.info >/dev/null 2>/dev/null
