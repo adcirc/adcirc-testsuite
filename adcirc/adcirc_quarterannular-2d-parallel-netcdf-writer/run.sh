@@ -62,7 +62,7 @@ fail=0
 for((i=0;i<$nfiles;i++))
 do
     echo -n "      "${files[$i]}": "
-    if [ "x${error[$i] }" != "x0" ] ; then
+    if [ "x${error[$i]}" != "x0" ] ; then
         echo "Failed"
         fail=1
     else
