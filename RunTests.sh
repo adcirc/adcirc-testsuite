@@ -11,6 +11,10 @@ case_list=( adcirc/adcirc_apes                                       \
             adcirc/adcirc_quarterannular-2d-parallel-netcdf          \
             adcirc/adcirc_quarterannular-2d-parallel-netcdf-writer   \
             adcirc/adcirc_quarterannular-2d-parallel-writer          \
+            adcirc/adcirc_quarterannular-2d-hotstart                 \
+            adcirc/adcirc_quarterannular-2d-netcdf-hotstart          \
+            adcirc/adcirc_quarterannular-2d-parallel-hotstart        \
+            adcirc/adcirc_quarterannular-2d-parallel-netcdf-hotstart \
             adcirc/adcirc_shinnecock_inlet                           \
             adcirc/adcirc_shinnecock_inlet-parallel                  \
             adcirc-swan/adcirc_swan_apes_irene                       \
