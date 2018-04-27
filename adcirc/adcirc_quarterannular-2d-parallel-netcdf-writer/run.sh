@@ -25,8 +25,8 @@ echo "|---------------------------------------------|"
 echo "    TEST CASE: $case_name"
 echo ""
 echo -n "    Prepping case..."
-$exepath/adcprep --np $np --partmesh >  adcprep.log
-$exepath/adcprep --np $np --prepall  >> adcprep.log
+$exepath/adcprep --np $(expr $np - 1) --partmesh >  adcprep.log
+$exepath/adcprep --np $(expr $np - 1) --prepall  >> adcprep.log
 if [ $? == 0 ] ; then
     echo "done!"
 else
@@ -35,7 +35,7 @@ else
 fi
 
 echo -n "    Runnning case..."
-mpirun --allow-run-as-root -np $np $exepath/padcirc > padcirc_log.txt
+mpirun --allow-run-as-root -np $np $exepath/padcirc -W 1 > padcirc_log.txt
 exitstat=$?
 echo "Finished"
 echo "    ADCIRC Exit Code: $exitstat"
