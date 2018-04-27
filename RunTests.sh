@@ -36,9 +36,16 @@ ODIR_padcswan=$adcirc_path/odir44
 #...Current home location
 TESTHOME=$(pwd)
 
+cont=0
+if [ $# -eq 2 ] ; then
+    if [ $2 == "--continue" ] ; then
+        cont=1
+    fi
+fi
+
 #...Sanity check on script arguments
-if [ $# -ne 1 ] ; then
-    echo "ERROR: Script requires 1 argument with folder containing adcirc.exe and adccmp.exe"
+if [ $# -ne 1 ] && [ $# -ne 2 ]  ; then
+    echo "ERROR: Script requires 1 argument with folder containing executables."
     exit 1
 fi
 
@@ -108,7 +115,9 @@ do
     ./run.sh $adcirc_path $err 2>/dev/null
     if [ $? -ne 0 ] ; then
         echo "ERROR: The case $CASE did not pass."
-        exit 1
+        if [ $cont == 0 ] ; then
+            exit 1
+        fi
     fi
 
     #...Back to testing home location
