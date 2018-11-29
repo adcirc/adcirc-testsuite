@@ -54,7 +54,11 @@ for((i=0;i<$nfiles;i++))
 do
     echo "" >> comparison.log
     echo "${files[$i]}" >> comparison.log
-    $exepath/adcircResultsComparison -t $err -f1 ${files[$i]} -f2 control/${files[$i]} >> comparison.log 2>>comparison.log
+    CLOPTIONS="-t $err"
+    if [[ ${files[$i]} = "maxvel.63" || ${files[$i]} = "maxele.63" || ${files[$i]} = "maxwvel.63" || ${files[$i]} = "minpr.63" ]]; then
+       CLOPTIONS="$CLOPTIONS --minmax"
+    fi        
+    $exepath/adcircResultsComparison $CLOPTIONS -f1 ${files[$i]} -f2 control/${files[$i]} >> comparison.log 2>>comparison.log
     cserror[$i]=$?
 done
 echo "Finished"
@@ -116,7 +120,11 @@ for((i=0;i<$nfiles;i++))
 do
     echo "" >> comparison.log
     echo "${files[$i]}" >> comparison.log
-    $exepath/adcircResultsComparison -t $err -f1 ${files[$i]} -f2 control/${files[$i]} >> comparison.log 2>>comparison.log
+    CLOPTIONS="-t $err"    
+    if [[ ${files[$i]} = "maxvel.63" || ${files[$i]} = "maxele.63" || ${files[$i]} = "maxwvel.63" || ${files[$i]} = "minpr.63" ]]; then
+       CLOPTIONS="$CLOPTIONS --minmax"
+    fi            
+    $exepath/adcircResultsComparison $CLOPTIONS -f1 ${files[$i]} -f2 control/${files[$i]} >> comparison.log 2>>comparison.log
     hserror[$i]=$?
 done
 echo "Finished"
