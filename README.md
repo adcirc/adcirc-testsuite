@@ -23,7 +23,7 @@ The automated test script (```RunTests.sh```) requires the following executables
   3. adcswan
   4. padcswan
   5. adcprep
-  6. adccmp
+  6. adcircResultsComparison (found in the util subdirectory of the ADCIRC source code)
 
 ### Running the Full Suite
 To run the tests, the following command is used:
@@ -35,9 +35,9 @@ Note that the path must be an absolute and not a relative path.
 ### Running a single case
 If you are not conducting the full test of the code, you may want to run only a single test. In this case, each folder contains a ```run.sh``` file which executes the commands necessary to run the model. This file is run as:
 ```
-./run.sh /path/to/adcirc/work/directory
+./run.sh /path/to/adcirc/work/directory maxerr
 ```
-In this case, relative paths may be used and you do not need to have all features turned on, only those required for a particular test.
+In this case, relative paths may be used and you do not need to have all features turned on, only those required for a particular test. The ```maxerr``` parameter is set to ```err=0.00001``` in the main ```RunTests.sh``` script. 
 
 ## Submitting a new case
 New cases are definitely welcomed. Anyone looking to submit a new case should follow one of the other directories as an example of how a case should be constructed. Cases should exercise a feature or combination of features that is not currently part of the test suite. Cases should be able to be run in under 10 minutes in serial to avoid the suite becoming too cumbersome to run. Cases should be submitted either to zachary.cobell@arcadis.com or via Pull Request with a description of the case and what it aims to test.
