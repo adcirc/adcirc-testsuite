@@ -16,7 +16,9 @@ case_list=( adcirc/adcirc_apes                                       \
             adcirc/adcirc_quarterannular-2d-parallel-hotstart        \
             adcirc/adcirc_quarterannular-2d-parallel-netcdf-hotstart \
             adcirc/adcirc_shinnecock_inlet                           \
-            adcirc/adcirc_shinnecock_inlet-parallel                  )
+            adcirc/adcirc_shinnecock_inlet-parallel                  \
+            adcirc/adcirc_katrina-2d                                 \
+            adcirc/adcirc_katrina-2d-parallel                        )
 # @jasonfleming 20181206 : FIXME : adcirc+swan tests failing for unknown reasons
 #            adcirc/adcirc_shinnecock_inlet-parallel                  \
 #            adcirc-swan/adcirc_swan_apes_irene                       \
@@ -27,13 +29,6 @@ err=0.00001
 
 #...Path to the executables
 adcirc_path=$1
-
-#...Object directories for each executable
-ODIR_adcirc=$adcirc_path/odir3
-ODIR_padcirc=$adcirc_path/odir4
-ODIR_adcprep=$adcirc_path/odir1
-ODIR_adcswan=$adcirc_path/odir33
-ODIR_padcswan=$adcirc_path/odir44
 
 #...Current home location
 TESTHOME=$(pwd)
@@ -93,13 +88,6 @@ if [ ! -s $1/padcswan ] ; then
     exit 1
 fi
 
-#...Check for GCOV files
-if [ -s $ODIR_adcirc/adcirc.gcno ] ; then
-    coverage=1
-else
-    coverage=0
-fi
-
 #...Loop to run over all the test cases
 for CASE in ${case_list[@]}
 do
@@ -125,25 +113,6 @@ do
     #...Back to testing home location
     cd $TESTHOME
 done
-
-#...Check to see if we need to generate coverage report
-if [ "x$coverage" == "x1" ] ; then
-    echo "Generating ADCIRC Coverage Report..."
-    ./GenerateCoverageReport.sh ADCIRC $ODIR_adcirc
-    echo ""
-    echo "Generating ADCPREP Coverage Report..."
-    ./GenerateCoverageReport.sh ADCPREP $ODIR_adcprep
-    echo ""
-    echo "Generating PADCIRC Coverage Report..."
-    ./GenerateCoverageReport.sh PADCIRC $ODIR_padcirc
-    echo ""
-    echo "Generating ADCSWAN Coverage Report..."
-    ./GenerateCoverageReport.sh ADCSWAN $ODIR_adcswan
-    echo ""
-    echo "Generating PADCSWAN Coverage Report..."
-    ./GenerateCoverageReport.sh PADCSWAN $ODIR_padcswan
-fi
-    
 
 #...Exit with status zero if all tests have passed
 exit 0
