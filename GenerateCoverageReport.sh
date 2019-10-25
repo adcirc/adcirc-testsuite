@@ -20,14 +20,19 @@ fi
 versionString=$(git --git-dir $1/../.git --work-tree $1/../ describe --always --tags)
 
 basedir=$1/CMakeFiles
-dirs=("adccmp.dir adcirc.dir" "adcircResultsComparison.dir" "adcprep.dir" "adcswan.dir" \
-      "aswip.dir build13.dir" "buildstwave23.dir" "hot2asc.dir" "hstime.dir" "inflate.dir" \
-      "metis.dir" "mkdir.dir" "owi22.dir" "p15.dir" "padcirc.dir" "padcswan.dir" \ 
-      "templib_adcirc1.dir" "templib_adcswan1.dir" "templib_adcswan2.dir" \
-      "templib_adcswan3.dir" "templib_padcirc1.dir" "templib_padcirc2.dir" "templib_padcirc3.dir" \
-      "templib_padcswan1.dir" "templib_padcswan2.dir" "templib_padcswan3.dir" "templib_padcswan4.dir" \
-      "templib_padcswan5.dir" "templib_swan1parallel.dir" "templib_swan2parallel.dir" 
-      "templib_swan1serial.dir" "templib_swan2serial.dir")
+
+i=0
+for F in $(find $1 -name "*.gcda") 
+do 
+    tmp=($(echo $F | sed 's/CMakeFiles/\n/g'))
+    tmp1=${tmp[1]}
+    tmp1=$(echo $tmp1 | cut -d/ -f2)
+    if [[ $tmp1 == *".dir"* ]] ; then
+        tmpdirs[$i]=$tmp1
+        i=$(expr $i + 1)
+    fi
+done
+dirs=($(echo "${tmpdirs[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
 
 #...Generate the trace files
 mkdir -p adcirc.cov
