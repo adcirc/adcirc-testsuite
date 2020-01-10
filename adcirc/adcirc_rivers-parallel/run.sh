@@ -1,10 +1,10 @@
 #!/bin/bash
 
-case_name="adcirc_nws30_wlcorrection"
+case_name="adcirc_rivers-parallel"
 
 #...Check on what is provided
 if [ $# -ne 2 ] ; then
-    echo "ERROR: Script requires 2 arguments!"
+    echo "ERROR: Script requires 3 arguments!"
     echo "    Argument 1: Folder containing adcirc and adccmp executables."
     echo "    Argument 2: Maximum error"
     echo "Exiting with status 1, Failed."
@@ -14,17 +14,28 @@ fi
 #...Set variables
 exepath=$1
 err=$2
+np=3
 
-nfiles=11
-files=( "dynamicWaterlevelCorrection.61.nc"  "dynamicWaterlevelCorrection.63.nc"  "fort.61.nc"  "fort.63.nc"  "fort.64.nc"  "fort.73.nc"  "fort.74.nc"  "maxele.63.nc"  "maxvel.63.nc"  "maxwvel.63.nc"  "minpr.63.nc" )
+nfiles=4
+files=( "fort.63.nc"  "fort.64.nc"  "maxele.63.nc"  "maxvel.63.nc" )
 
 #...Run the case
 echo ""
 echo "|---------------------------------------------|"
 echo "    TEST CASE: $case_name"
 echo ""
+echo -n "    Prepping case..."
+$exepath/adcprep --np $np --partmesh >  adcprep.log
+$exepath/adcprep --np $np --prepall  >> adcprep.log
+if [ $? == 0 ] ; then
+    echo "done!"
+else
+    echo "ERROR!"
+    exit 1
+fi
+
 echo -n "    Runnning case..."
-$exepath/adcirc > adcirc_log.txt
+mpirun --allow-run-as-root -np $np $exepath/padcirc > padcirc_log.txt
 exitstat=$?
 echo "Finished"
 echo "    ADCIRC Exit Code: $exitstat"
@@ -44,7 +55,7 @@ do
     CLOPTIONS="-t $err"    
     if [[ ${files[$i]} = "maxvel.63.nc" || ${files[$i]} = "maxele.63.nc" || ${files[$i]} = "maxwvel.63.nc" || ${files[$i]} = "minpr.63.nc" ]]; then
        CLOPTIONS="$CLOPTIONS --minmax"
-    fi                
+    fi            
     $exepath/adcircResultsComparison $CLOPTIONS -f1 ${files[$i]} -f2 control/${files[$i]} >> comparison.log 2>>comparison.log
     error[$i]=$?
 done
