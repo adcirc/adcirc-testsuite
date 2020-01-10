@@ -1,6 +1,6 @@
 #!/bin/bash
 
-case_name="adcirc_shinnecock_inlet"
+case_name="adcirc_nws30_wlcorrection"
 
 #...Check on what is provided
 if [ $# -ne 2 ] ; then
@@ -42,7 +42,7 @@ do
     echo "" >> comparison.log
     echo "${files[$i]}" >> comparison.log
     CLOPTIONS="-t $err"    
-    if [[ ${files[$i]} = "maxvel.63" || ${files[$i]} = "maxele.63" || ${files[$i]} = "maxwvel.63" || ${files[$i]} = "minpr.63" ]]; then
+    if [[ ${files[$i]} = "maxvel.63.nc" || ${files[$i]} = "maxele.63.nc" || ${files[$i]} = "maxwvel.63.nc" || ${files[$i]} = "minpr.63.nc" ]]; then
        CLOPTIONS="$CLOPTIONS --minmax"
     fi                
     $exepath/adcircResultsComparison $CLOPTIONS -f1 ${files[$i]} -f2 control/${files[$i]} >> comparison.log 2>>comparison.log
