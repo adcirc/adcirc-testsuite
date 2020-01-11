@@ -16,8 +16,8 @@ exepath=$1
 err=$2
 np=3
 
-nfiles=11
-files=( "dynamicWaterlevelCorrection.61.nc"  "dynamicWaterlevelCorrection.63.nc"  "fort.61.nc"  "fort.63.nc"  "fort.64.nc"  "fort.73.nc"  "fort.74.nc"  "maxele.63.nc"  "maxvel.63.nc"  "maxwvel.63.nc"  "minpr.63.nc" )
+nfiles=13
+files=( "dynamicWaterlevelCorrection.61.nc"  "dynamicWaterlevelCorrection.63.nc"  "fort.61"  "fort.63"  "fort.62"  "fort.64"  "fort.71.nc"  "fort.72.nc"  "fort.73.nc"  "fort.74.nc"  "maxele.63"  "maxvel.63"  "maxwvel.63.nc"  "minpr.63.nc" )
 
 #...Run the case
 echo ""
