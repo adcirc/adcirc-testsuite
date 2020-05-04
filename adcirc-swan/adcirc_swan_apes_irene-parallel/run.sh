@@ -17,11 +17,10 @@ err=$2
 np=3
 
 nfiles=22
-files=( "fort.63" "fort.73" "maxele.63" "maxvel.63" "minpr.63" "swan_DIR.63" \
-        "swan_HS.63" "swan_TM01.63" "swan_TM02.63" "swan_TMM10.63" "swan_TPS.63" \
-        "fort.64" "fort.74" "maxrs.63" "maxwvel.63" "rads.64" "swan_DIR_max.63" \
-        "swan_HS_max.63" "swan_TM01_max.63" "swan_TM02_max.63" "swan_TMM10_max.63" \
-        "swan_TPS_max.63" )
+files=( "fort.63.nc"  "maxele.63.nc"   "minpr.63.nc"        "swan_HS.63.nc"        "swan_TM02.63.nc"       "swan_TPS.63.nc"
+        "fort.64.nc"  "maxrs.63.nc"    "rads.64.nc"         "swan_HS_max.63.nc"    "swan_TM02_max.63.nc"   "swan_TPS_max.63.nc"
+        "fort.73.nc"  "maxvel.63.nc"   "swan_DIR.63.nc"     "swan_TM01.63.nc"      "swan_TMM10.63.nc"
+        "fort.74.nc"  "maxwvel.63.nc"  "swan_DIR_max.63.nc" "swan_TM01_max.63.nc"  "swan_TMM10_max.63.nc" )
 
 #...Run the case
 echo ""
@@ -56,7 +55,11 @@ for((i=0;i<$nfiles;i++))
 do
     echo "" >> comparison.log
     echo "${files[$i]}" >> comparison.log
-    $exepath/adcircResultsComparison -t $err -f1 ${files[$i]} -f2 control/${files[$i]} >> comparison.log 2>>comparison.log
+    CLOPTIONS="-t $err"
+    if [[ ${files[$i]} == "*max*" || ${files[$i]} == "*min*" ]]; then
+       CLOPTIONS="$CLOPTIONS --minmax"
+    fi
+    $exepath/adcircResultsComparison $CLOPTIONS -f1 ${files[$i]} -f2 control/${files[$i]} >> comparison.log 2>>comparison.log
     error[$i]=$?
 done
 echo "Finished"
