@@ -45,7 +45,11 @@ for((i=0;i<$nfiles;i++))
 do
     echo "" >> comparison.log
     echo "${files[$i]}" >> comparison.log
-    $exepath/adcircResultsComparison -t $err -f1 ${files[$i]} -f2 control/${files[$i]} >> comparison.log 2>>comparison.log
+    CLOPTIONS="-t $err"
+    if [[ ${files[$i]} == "*max*" || ${files[$i]} == "*min*" ]]; then
+       CLOPTIONS="$CLOPTIONS --minmax"
+    fi
+    $exepath/adcircResultsComparison $CLOPTIONS -f1 ${files[$i]} -f2 control/${files[$i]} >> comparison.log 2>>comparison.log
     error[$i]=$?
 done
 echo "Finished"
