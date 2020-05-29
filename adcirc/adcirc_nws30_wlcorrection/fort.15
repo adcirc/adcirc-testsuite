@@ -460,7 +460,7 @@ NCCOM
 NCHOST
 NCCONV
 NCCONT
-NCDATE
+2020-04-28 00:00:00
 &dynamicWaterlevelCorrectionControl dynamicWaterlevelCorrectionFileName='wlCorrection.dat', 
                                     dynamicWaterlevelCorrectionSkipSnaps=0, dynamicWaterlevelCorrectionMultiplier=0.1, 
                                     dynamicWaterlevelCorrectionRampStart=0.0, dynamicWaterlevelCorrectionRampEnd=43200.0, 
