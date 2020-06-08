@@ -25,8 +25,7 @@ case_list=( adcirc/adcirc_rivers                                     \
             adcirc/adcirc_quarterannular-2d-parallel-hotstart        \
             adcirc/adcirc_quarterannular-2d-parallel-netcdf-hotstart \
             adcirc/adcirc_shinnecock_inlet                           \
-            adcirc/adcirc_shinnecock_inlet-parallel                              
-            )
+            adcirc/adcirc_shinnecock_inlet-parallel                  )
 # @jasonfleming 20181206 : FIXME : adcirc+swan tests failing for unknown reasons
 #            adcirc/adcirc_shinnecock_inlet-parallel                  \
 #            adcirc-swan/adcirc_swan_apes_irene                       \
