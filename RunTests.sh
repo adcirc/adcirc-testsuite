@@ -1,7 +1,16 @@
 #!/bin/bash
 
 #...List of ADCIRC's test cases. Cases are named by their directory tree
-case_list=( adcirc/adcirc_apes                                       \
+case_list=( adcirc/adcirc_rivers                                     \
+            adcirc/adcirc_rivers-parallel                            \
+            adcirc/adcirc_nws30_wlcorrection                         \
+            adcirc/adcirc_nws30_wlcorrection-parallel                \
+            adcirc/adcirc_katrina-2d                                 \
+            adcirc/adcirc_katrina-2d-parallel                        \
+            adcirc/adcirc_global_nws10-2d                            \
+            adcirc/adcirc_global-tide-2d                             \
+            adcirc/adcirc_global-tide+surge-2d                       \
+            adcirc/adcirc_apes                                       \
             adcirc/adcirc_apes-parallel                              \
             adcirc/adcirc_internal_overflow                          \
             adcirc/adcirc_internal_overflow-parallel                 \
@@ -16,16 +25,8 @@ case_list=( adcirc/adcirc_apes                                       \
             adcirc/adcirc_quarterannular-2d-parallel-hotstart        \
             adcirc/adcirc_quarterannular-2d-parallel-netcdf-hotstart \
             adcirc/adcirc_shinnecock_inlet                           \
-            adcirc/adcirc_shinnecock_inlet-parallel                  \
-            adcirc/adcirc_katrina-2d                                 \
-            adcirc/adcirc_katrina-2d-parallel                        \
-            adcirc/adcirc_rivers                                     \
-            adcirc/adcirc_rivers-parallel                            \
-            adcirc/adcirc_nws30_wlcorrection                         \
-            adcirc/adcirc_nws30_wlcorrection-parallel                \
-            adcirc/adcirc_global_nws10-2d                            \
-            adcirc/adcirc_global-tide-2d                             \
-            adcirc/adcirc_global-tide+surge-2d                       )
+            adcirc/adcirc_shinnecock_inlet-parallel                              
+            )
 # @jasonfleming 20181206 : FIXME : adcirc+swan tests failing for unknown reasons
 #            adcirc/adcirc_shinnecock_inlet-parallel                  \
 #            adcirc-swan/adcirc_swan_apes_irene                       \
