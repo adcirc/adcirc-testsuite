@@ -1,6 +1,6 @@
 #!/bin/bash
 
-case_name="aadcirc_nws30_wlcorrection-parallel"
+case_name="adcirc_nws30_wlcorrection-parallel"
 
 #...Check on what is provided
 if [ $# -ne 2 ] ; then
