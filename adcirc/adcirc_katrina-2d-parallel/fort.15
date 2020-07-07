@@ -551,7 +551,7 @@ Comments: None
 Host: Name
 Metric, MSL
 name@instit.edu
-08-19-2005
+2005-08-19 00:00:00
 ! -- Begin met Control Namelist -- 
 &metControl
 WindDragLimit = 2.500000e-03,
