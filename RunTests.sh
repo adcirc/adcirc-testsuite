@@ -25,8 +25,7 @@ case_list=( adcirc/adcirc_apes                                       \
             adcirc/adcirc_quarterannular-2d-parallel-netcdf-hotstart \
             adcirc/adcirc_shinnecock_inlet-parallel                  \
             adcirc/adcirc_nws30_wlcorrection-parallel                \
-            adcirc/adcirc_katrina-2d-parallel                        \
-            )
+            adcirc/adcirc_katrina-2d-parallel                        )
 #            adcirc/adcirc_ideal_channel-2d-parallel                  \
 #            adcirc/adcirc_alaska_ice-2d                              \
 #            )
