@@ -26,6 +26,8 @@ case_list=( adcirc/adcirc_apes                                       \
             adcirc/adcirc_shinnecock_inlet-parallel                  \
             adcirc/adcirc_nws30_wlcorrection-parallel                \
             adcirc/adcirc_katrina-2d-parallel                        \
+            adcirc/adcirc_katrina-2d-nws13                           \
+            adcirc/adcirc_katrina-2d-nws13-parallel                  \
             adcirc/adcirc_ideal_channel-2d-parallel                  \
             adcirc/adcirc_ideal_channel-woffset-2d-parallel          \
             adcirc/adcirc_global-alidisp+buoyancy-2d-parallel        \

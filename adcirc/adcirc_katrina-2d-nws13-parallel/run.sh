@@ -1,6 +1,6 @@
 #!/bin/bash
 
-case_name="adcirc_katrina-2d-parallel"
+case_name="adcirc_katrina-2d-nws13-parallel"
 
 #...Check on what is provided
 if [ $# -ne 2 ] ; then
