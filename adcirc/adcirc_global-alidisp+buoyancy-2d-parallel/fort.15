@@ -60,9 +60,9 @@ wpringle@nd.edu
 2020-01-01 12:00:00
 ! -- Begin density Control Namelist -- 
 &densityControl
-densityRunType = diagnostic,
-densityForcingType = Buoyancyfrequencies,
-densityFileName = buoyancyfrequencies.nc,
+densityRunType = "diagnostic",
+densityForcingType = "Buoyancyfrequencies",
+densityFileName = "buoyancyfrequencies.nc",
 /
 ! -- End density Control Namelist -- 
 ! -- Begin Ali Dispersion Control Namelist -- 
