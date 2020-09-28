@@ -1,0 +1,143 @@
+ riverspinup                               ! 32 CHARACTER ALPHANUMERIC RUN DESCRIPTION
+ padcirc 49_14                             ! 24 CHARACTER ALPANUMERIC RUN IDENTIFICATION
+ 1, 20.0, 0, 50, 1000.0 ! NFOVER, warnelv,iwarndump,warnelevdumplimit,errorelev
+ 1                    ! NABOUT - ABREVIATED OUTPUT OPTION PARAMETER
+ 600                   ! NSCREEN - UNIT 6 OUTPUT OPTION PARAMETER
+ 0                     !  IHOT - HOT START PARAMETER
+ 20                     ! ICS - COORDINATE SYSTEM SELECTION PARAMETER
+ 511113                ! IM - MODEL SELECTION PARAMETER 
+ 1                     ! NOLIBF - BOTTOM FRICTION TERM SELECTION PARAMETER
+ 3                     ! NOLIFA - FINITE AMPLITUDE TERM SELECTION PARAMETER
+ 0                     ! NOLICA - SPATIAL DERIVATIVE CONVECTIVE SELECTION PARAMETER
+ 0                     ! NOLICAT - TIME DERIVATIVE CONVECTIVE TERM SELECTION PARAMETER
+ 1                     ! NWP - VARIABLE BOTTOM FRICTION AND LATERAL VISCOSITY OPTION PARAMETER
+mannings_n_at_sea_floor
+ 1                     ! NCOR - VARIABLE CORIOLIS IN SPACE OPTION PARAMETER
+ 0                     ! NTIP - TIDAL POTENTIAL OPTION PARAMETER
+ 0                     ! NWS - WIND STRESS AND BAROMETRIC PRESSURE OPTION PARAMETER
+ 2                     ! NRAMP - RAMP FUNCTION OPTION
+ 9.81                  ! G - ACCELERATION DUE TO GRAVITY - DETERMINES UNITS
+ 0.32                  ! TAU0 - WEIGHTING FACTOR IN GWCE
+ 5.00                  ! DT - TIME STEP (IN SECONDS)
+ 0.00                  ! STATIM - STARTING TIME (IN DAYS)
+ 0.00                  ! REFTIM - REFERENCE TIME (IN DAYS)
+ 5.000000              !  RNDAY - TOTAL LENGTH OF SIMULATION (IN DAYS)
+ 1.1 0.5 1.0           ! DRAMP - DURATION OF RAMP FUNCTION (IN DAYS)
+ 0.50 0.50 0.00        ! TIME WEIGHTING FACTORS FOR THE GWCE EQUATION
+ 0.10 0 0 0.01         ! H0, NODEDRYMIN, NODEWETMIN, VELMIN
+ 265.5 29.0            ! SLAM0,SFEA0 - CENTER OF CPP PROJECTION (NOT USED IF ICS=1, NTIP=0, NCOR=0)
+ 0.0010 2.0 10 1.33333 ! FFACTOR,HBREAK,FTHETA,FGAMMA
+ -0.2                  ! ESL - LATERAL EDDY VISCOSITY COEFFICIENT; IGNORED IF NWP =1
+ 0.0                   ! CORI - CORIOLIS PARAMETER - IGNORED IF NCOR = 1
+ 0                                       ! NTIF - NUMBER OF TIDAL POTENTIAL CONSTITUENTS
+ 1                                       ! NBFR - NUMBER OF PERIODIC FORCING FREQUENCIES ON ELEVATION SPECIFIED BOUNDARIES
+ STEADY                                   ! BOUNTAG - FORCING CONSTITUENT NAME
+ 0.000 1.000 0.00000
+ STEADY                                   ! EALPHA - FORCING CONSTITUENT NAME AGAIN
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 0.000000 0.000                           ! EMO, EFA
+ 110.0                      ! ANGINN : INNER ANGLE THRESHOLD
+1                     ! NFFR - TOTAL NUMBER OF FORCING FREQUENCIES ON FLUX BOUNDARIES
+ STEADY               ! CONSTITUENT. 1  ALPHA DESCRIPTOR
+ 0.00000E-00  1.0 0.0   ! CONSTITUENT. 1 FREQ., NODAL FACTOR, EQUIL. ARG.
+  STEADY       ! ALPHA NUMERIC DESCRIPTION OF ELEVATION BOUNDARY FORCING
+30.0    0.00
+60.0    0.00
+60.0    0.00
+60.0    0.00
+60.0    0.00
+60.0    0.00
+60.0    0.00
+60.0    0.00
+60.0    0.00
+60.0    0.00
+30.0    0.00
+ 1 0.0 5.0 600              ! NOUTE,TOUTSE,TOUTFE,NSPOOLE:ELEV STATION OUTPUT INFO (UNIT  61)
+ 2                          ! NSTAE - NUMBER OF ELEVATION RECORDING STATIONS, FOLLOWED BY LOCATIONS ON PROCEEDING LINES
+ -90.44254,30.00142
+ -90.44175,30.00365
+ 0 0.0 5.0 1800             ! NOUTV,TOUTSV,TOUTFV,NSPOOLV:VEL STATION OUTPUT INFO (UNIT  62)
+ 0                          ! NSVEL - NUMBER OF ELEVATION RECORDING STATIONS, FOLLOWED BY LOCATIONS ON PROCEEDING LINES
+-5 0.0 5.0  600             !  NOUTGE,TOUTSGE,TOUTFGE,NSPOOLGE : GLOBAL ELEVATION OUTPUT INFO (UNIT  63)
+-5 0.0 5.0  600             !  NOUTGV,TOUTSGV,TOUTFGV,NSPOOLGV : GLOBAL VELOCITY  OUTPUT INFO (UNIT  64)    
+ 0                          ! NHARFR - NUMBER OF CONSTITUENTS TO BE INCLUDED IN THE HARMONIC ANALYSIS
+ 40.0  50.0  5  0.0         ! THAS,THAF,NHAINC,FMV - HARMONIC ANALYSIS PARAMETERS    
+ 1 1 1 1                    ! NHASE,NHASV,NHAGE,NHAGV - CONTROL HARMONIC ANALYSIS AND OUTPUT TO UNITS 51,52,53,54
+ 0 86400                    ! NHSTAR,NHSINC - HOT START FILE GENERATION PARAMETERS 
+ 1  0  1.E-7  25 0          ! ITITER, ISLDIA, CONVCR, ITMAX & ILUMP
+TVW_ScheduleTest
+TheWaterInstitute
+TimeVaryingWeirTest
+History: None
+https://adcirc.org
+Comments: None
+Host: Name
+Metric, MSL
+zcobell@thewaterintitute.org
+2005-08-01 00:00:00
+ &TVWControl USE_TVW=.TRUE. TVW_FILE='sched-bonnet.in' NOUT_TVW=4 TOUTS_TVW=0 TOUTF_TVW=5 NSPOOL_TVW=600 / 
