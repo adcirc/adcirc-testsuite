@@ -1,0 +1,57 @@
+
+fort.63.nc
+Code stopped at snap 1.
+Summary of results file comparison
+
+|-----------------------------------------------------------------------|
+|  TIMESNAP  |  NUMDIFF  |  AVERAGE DIFF  |  MAXIMUM DIFF  |  NUMERROR  |
+|-----------------------------------------------------------------------|
+|        1   |     65471 |  -8.6436E-001  |  -9.9999E+004  |       133  |
+|-----------------------------------------------------------------------|
+
+  -->       Error Tolerance:  1.0000E-005
+  --> Wet/Dry Diffs Skipped: No
+Results do not match within specified tolerance.
+1
+
+fort.64.nc
+Code stopped at snap 1.
+Summary of results file comparison
+
+|-----------------------------------------------------------------------|
+|  TIMESNAP  |  NUMDIFF  |  AVERAGE DIFF  |  MAXIMUM DIFF  |  NUMERROR  |
+|-----------------------------------------------------------------------|
+|        1   |    214912 |  -4.0460E+004  |   9.9999E+004  |     47017  |
+|-----------------------------------------------------------------------|
+
+  -->       Error Tolerance:  1.0000E-005
+  --> Wet/Dry Diffs Skipped: No
+Results do not match within specified tolerance.
+1
+
+fort.73.nc
+Code stopped at snap 1.
+Summary of results file comparison
+
+|-----------------------------------------------------------------------|
+|  TIMESNAP  |  NUMDIFF  |  AVERAGE DIFF  |  MAXIMUM DIFF  |  NUMERROR  |
+|-----------------------------------------------------------------------|
+|        1   |    115691 |   2.4366E-003  |   2.4366E-003  |    115691  |
+|-----------------------------------------------------------------------|
+
+  -->       Error Tolerance:  1.0000E-005
+  --> Wet/Dry Diffs Skipped: No
+Results do not match within specified tolerance.
+1
+
+fort.74.nc
+Summary of results file comparison
+
+|-----------------------------------------------------------------------|
+|  TIMESNAP  |  NUMDIFF  |  AVERAGE DIFF  |  MAXIMUM DIFF  |  NUMERROR  |
+|-----------------------------------------------------------------------|
+|-----------------------------------------------------------------------|
+
+  -->       Error Tolerance:  1.0000E-005
+  --> Wet/Dry Diffs Skipped: No
+Results match within specified tolerance.
