@@ -26,7 +26,7 @@ echo "|---------------------------------------------|"
 echo "    TEST CASE: $case_name"
 echo ""
 echo -n "    Runnning case..."
-$exepath/adcirc > adcirc_log.txt
+$exepath/adcirc > adcirc.log
 exitstat=$?
 echo "Finished"
 echo "    ADCIRC Exit Code: $exitstat"
