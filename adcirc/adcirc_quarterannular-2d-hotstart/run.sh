@@ -25,7 +25,7 @@ echo "    TEST CASE: $case_name"
 echo ""
 echo -n "    Runnning cold start..."
 cd 01_cs
-$exepath/adcirc > adcirc_log.txt
+$exepath/adcirc > cold_adcirc.log
 exitstat=$?
 echo "Finished"
 echo "    ADCIRC Exit Code: $exitstat"
@@ -40,13 +40,13 @@ echo ""
 echo -n "    Running cold start comparison..."
 for((i=0;i<$nfiles;i++))
 do
-    echo "" >> comparison.log
-    echo "${files[$i]}" >> comparison.log
+    echo "" >> cold_comparison.log
+    echo "${files[$i]}" >> cold_comparison.log
     CLOPTIONS="-t $err"    
     if [[ ${files[$i]} = "maxvel.63" || ${files[$i]} = "maxele.63" || ${files[$i]} = "maxwvel.63" || ${files[$i]} = "minpr.63" ]]; then
        CLOPTIONS="$CLOPTIONS --minmax"
     fi    
-    $exepath/adcircResultsComparison $CLOPTIONS -f1 ${files[$i]} -f2 control/${files[$i]} >> comparison.log 2>>comparison.log
+    $exepath/adcircResultsComparison $CLOPTIONS -f1 ${files[$i]} -f2 control/${files[$i]} >> cold_comparison.log 2>>cold_comparison.log
     cserror[$i]=$?
 done
 echo "Finished"
@@ -83,7 +83,7 @@ cd ../02_hs
 #...Grab the hotstart data
 ./copy_hotstart.sh
 
-$exepath/adcirc > adcirc_log.txt
+$exepath/adcirc > hot_adcirc.log
 exitstat=$?
 echo "Finished"
 echo "    ADCIRC Exit Code: $exitstat"
@@ -97,13 +97,13 @@ echo ""
 echo -n "    Running hot start comparison..."
 for((i=0;i<$nfiles;i++))
 do
-    echo "" >> comparison.log
-    echo "${files[$i]}" >> comparison.log
+    echo "" >> hot_comparison.log
+    echo "${files[$i]}" >> hot_comparison.log
     CLOPTIONS="-t $err"
     if [[ ${files[$i]} = "maxvel.63" || ${files[$i]} = "maxele.63" || ${files[$i]} = "maxwvel.63" || ${files[$i]} = "minpr.63" ]]; then
        CLOPTIONS="$CLOPTIONS --minmax"
     fi        
-    $exepath/adcircResultsComparison $CLOPTIONS -f1 ${files[$i]} -f2 control/${files[$i]} >> comparison.log 2>>comparison.log
+    $exepath/adcircResultsComparison $CLOPTIONS -f1 ${files[$i]} -f2 control/${files[$i]} >> hot_comparison.log 2>>hot_comparison.log
     hserror[$i]=$?
 done
 echo "Finished"

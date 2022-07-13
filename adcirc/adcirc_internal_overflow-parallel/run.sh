@@ -35,7 +35,7 @@ else
 fi
 
 echo -n "    Runnning case..."
-mpirun --allow-run-as-root -np $np $exepath/padcirc > padcirc_log.txt
+mpirun --allow-run-as-root -np $np $exepath/padcirc > padcirc.log
 exitstat=$?
 echo "Finished"
 echo "    ADCIRC Exit Code: $exitstat"
