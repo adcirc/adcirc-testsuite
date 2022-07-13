@@ -27,8 +27,8 @@ echo ""
 cd 01_cs
 
 echo -n "    Prepping case..."
-$exepath/adcprep --np $np --partmesh >  adcprep.log
-$exepath/adcprep --np $np --prepall  >> adcprep.log
+$exepath/adcprep --np $np --partmesh >  cold_adcprep.log
+$exepath/adcprep --np $np --prepall  >> cold_adcprep.log
 if [ $? == 0 ] ; then
     echo "done!"
 else
@@ -37,7 +37,7 @@ else
 fi
 
 echo -n "    Runnning cold start..."
-mpirun --allow-run-as-root -np $np $exepath/padcirc > padcirc_log.txt
+mpirun --allow-run-as-root -np $np $exepath/padcirc > cold_padcirc.log
 exitstat=$?
 echo "Finished"
 echo "    PADCIRC Exit Code: $exitstat"
@@ -52,9 +52,9 @@ echo ""
 echo -n "    Running cold start comparison..."
 for((i=0;i<$nfiles;i++))
 do
-    echo "" >> comparison.log
-    echo "${files[$i]}" >> comparison.log
-    $exepath/adcircResultsComparison -t $err -f1 ${files[$i]} -f2 control/${files[$i]} >> comparison.log 2>>comparison.log
+    echo "" >> cold_comparison.log
+    echo "${files[$i]}" >> cold_comparison.log
+    $exepath/adcircResultsComparison -t $err -f1 ${files[$i]} -f2 control/${files[$i]} >> cold_comparison.log 2>>cold_comparison.log
     cserror[$i]=$?
 done
 echo "Finished"
@@ -91,8 +91,8 @@ cd ../02_hs
 ./copy_hotstart.sh
 
 echo -n "    Prepping case..."
-$exepath/adcprep --np $np --partmesh >  adcprep.log
-$exepath/adcprep --np $np --prepall  >> adcprep.log
+$exepath/adcprep --np $np --partmesh >  hot_adcprep.log
+$exepath/adcprep --np $np --prepall  >> hot_adcprep.log
 if [ $? == 0 ] ; then
     echo "done!"
 else
@@ -100,7 +100,7 @@ else
     exit 1
 fi
 echo -n "    Runnning hot start..."
-mpirun --allow-run-as-root -np $np $exepath/padcirc > padcirc_log.txt
+mpirun --allow-run-as-root -np $np $exepath/padcirc > hot_padcirc.log
 exitstat=$?
 echo "Finished"
 echo "    PADCIRC Exit Code: $exitstat"
@@ -114,9 +114,9 @@ echo ""
 echo -n "    Running hot start comparison..."
 for((i=0;i<$nfiles;i++))
 do
-    echo "" >> comparison.log
-    echo "${files[$i]}" >> comparison.log
-    $exepath/adcircResultsComparison -t $err -f1 ${files[$i]} -f2 control/${files[$i]} >> comparison.log 2>>comparison.log
+    echo "" >> hot_comparison.log
+    echo "${files[$i]}" >> hot_comparison.log
+    $exepath/adcircResultsComparison -t $err -f1 ${files[$i]} -f2 control/${files[$i]} >> hot_comparison.log 2>>hot_comparison.log
     hserror[$i]=$?
 done
 echo "Finished"
