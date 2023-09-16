@@ -33,7 +33,8 @@ case_list=( adcirc/adcirc_apes                                       \
             adcirc/adcirc_global-alidisp+buoyancy-2d-parallel        \
             adcirc/adcirc_alaska_ice-2d                              \
             adcirc/adcirc_timevaryingweirs-parallel                  \
-	    adcirc/adcirc_shinnecock_inlet-parallel                  \)
+	    adcirc/adcirc_shinnecock_inlet-parallel                  \
+            adcirc/adcirc_baroclinic_2d_serial                       \
             adcirc/adcirc_slopingbeach_vew1d-parallel                )
 # @jasonfleming 20181206 : FIXME : adcirc+swan tests failing for unknown reasons
 #            adcirc-swan/adcirc_swan_apes_irene                       \
