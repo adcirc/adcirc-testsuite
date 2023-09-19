@@ -1,0 +1,17 @@
+*.nc filter=lfs diff=lfs merge=lfs -text
+*.grb filter=lfs diff=lfs merge=lfs -text
+*.grb2 filter=lfs diff=lfs merge=lfs -text
+*.63 filter=lfs diff=lfs merge=lfs -text
+*.64 filter=lfs diff=lfs merge=lfs -text
+*.73 filter=lfs diff=lfs merge=lfs -text
+*.74 filter=lfs diff=lfs merge=lfs -text
+*.61 filter=lfs diff=lfs merge=lfs -text
+*.62 filter=lfs diff=lfs merge=lfs -text
+max*.6* filter=lfs diff=lfs merge=lfs -text
+*.221 filter=lfs diff=lfs merge=lfs -text
+*.222 filter=lfs diff=lfs merge=lfs -text
+*.223 filter=lfs diff=lfs merge=lfs -text
+*.224 filter=lfs diff=lfs merge=lfs -text
+*.pre filter=lfs diff=lfs merge=lfs -text
+*.wnd filter=lfs diff=lfs merge=lfs -text
+*.win filter=lfs diff=lfs merge=lfs -text
