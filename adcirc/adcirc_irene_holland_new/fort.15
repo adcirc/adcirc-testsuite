@@ -1,0 +1,74 @@
+Albemarle-Pamlico Estuarine System (APES)
+Run_001
+1         	 ! NFOVER 
+1        	 ! NABOUT 
+720        	 ! NSCREEN 
+0        	 ! IHOT 
+22        	 ! ICS 
+513113        	 ! IM 
+1        	 ! NOLIBF 
+2        	 ! NOLIFA 
+1        	 ! NOLICA 
+1        	 ! NOLICAT 
+4        	 ! NWP 
+sea_surface_height_above_geoid
+primitive_weighting_in_continuity_equation
+mannings_n_at_sea_floor
+average_horizontal_eddy_viscosity_in_sea_water_wrt_depth
+1   	 	 ! NCOR 
+0   	 	 ! NTIP 
+8   	 	 ! NWS 
+0   	 	 ! NRAMP 
+9.810000   	 ! G  
+0.05   	 	 ! TAU0 
+5  	 	 ! DTDP 
+0  	 	 ! STATIM 
+0  	 	 ! REFTIM 
+2011 8 21 0 1 0.85  	 ! YYYY MM DD HH24 StormNumber BLAdj 
+9   	 	 ! RNDY 
+0  	 	 ! DRAMP 
+0.5 0.5 0  	 ! A00, B00, C00 
+0.1 0 0 0.01    	 ! H0, 2*dummy, VELMIN 
+-76.053820 35.493584  	 	 ! SLAM0, SFEA0 
+0.001000     	 ! CF 
+-0.200000     	 ! ELSM 
+0.000000   	 ! CORI 
+0   	 	 ! NTIF 
+0   	 	 ! NBFR 
+90   	 	 ! ANGINN 
+0 0 0 0   	 ! NOUTE, TOUTSE, TOUTFE, NSPOOLE 
+0  	 	 ! NSTAE 
+0 0 0 0  	 ! NOUTV, TOUTV, TOUTFV, NSPOOLV 
+0  	 	 ! NSTAV 
+0 0 0 0  	 ! NOUTM, TOUTM, TOUTFM, NSPOOLM 
+0   	 	 ! NSTAM 
+3 0 9 720  	 ! NOUTGE, ... 
+3 0 9 720  	 ! NOUTGV, ... 
+3 0 9 720  	 ! NOUTGM, ... 
+0  	 	 ! NFREQ 
+0 0 0 0  	 ! THAS, THAF, NHAINC, FMV 
+0 0 0 0   	 ! NHASE, NHASV, NHAGE, NHAGV 
+0 0  	 ! NHSTAR, NHSINC 
+1 0   1.000000000e-10 25  	 ! ITITER, ISLDIA, CONVCR, ITMAX 
+Albemarle-Pamlico Estuarine System (APES)
+Affiliation
+Made by OceanMesh2D
+History: None
+https://github.com/CHLNDDEV/OceanMesh2D/
+Comments: None
+Host: Name
+Metric, Datum
+name@instit.edu
+2011-08-21 00:00:00 UTC
+! -- Begin nws8 Control Namelist -- 
+&nws8Control
+vortexModel = 'Holland',
+backgroundWindModel = 'radialVelocityWeighted',
+BCalc = 'exact',
+thetaLatDep = .true.,
+useInflow = .true.,
+w_cool = 2.0,
+CkCd_calc = .false.,
+CkCd = 1.0,
+/
+! -- End nws8 Control Namelist -- 
