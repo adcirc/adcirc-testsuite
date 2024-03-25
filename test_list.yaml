@@ -1,0 +1,96 @@
+tests:
+  alaska_ice_2d:
+    path: adcirc/adcirc_alaska_ice-2d
+    model: adcirc
+    parallel: false
+    hotstart: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - maxwvel.63.nc
+    rm_files:
+      - fort.221.inv
+      - fort.222.inv
+      - fort.225.inv
+  apes:
+    path: adcirc/adcirc_apes
+    model: adcirc
+    parallel: false
+    hotstart: false
+    output_files:
+      - fort.61
+      - fort.62
+      - fort.63
+      - fort.64
+      - fort.71
+      - fort.72
+      - fort.73
+      - fort.74
+      - maxele.63
+      - maxvel.63
+      - maxwvel.63
+      - minpr.63
+  apes-parallel:
+    path: adcirc/adcirc_apes-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    output_files:
+      - fort.61
+      - fort.62
+      - fort.63
+      - fort.64
+      - fort.71
+      - fort.72
+      - fort.73
+      - fort.74
+      - maxele.63
+      - maxvel.63
+      - maxwvel.63
+      - minpr.63
+  baroclinic_2d_parallel:
+    path: adcirc/adcirc_baroclinic_2d_parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    output_files:
+      - fort.63.nc
+      - maxele.63.nc
+  baroclinic_2d_serial:
+    path: adcirc/adcirc_baroclinic_2d_serial
+    model: adcirc
+    parallel: false
+    hotstart: false
+    output_files:
+      - fort.63.nc
+      - maxele.63.nc
+  adcirc_global-alidisp+buoyancy-2d-parallel:
+    path: adcirc/adcirc_global-alidisp+buoyancy-2d-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+  quarterannular-2d:
+    path: adcirc/adcirc_quarterannular-2d
+    model: adcirc
+    parallel: false
+    hotstart: false
+    output_files:
+      - fort.61
+      - fort.62
+      - fort.63
+      - fort.64
+      - maxele.63
+      - maxvel.63
+
