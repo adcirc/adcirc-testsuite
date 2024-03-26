@@ -1,9 +1,11 @@
 tests:
-  alaska_ice_2d:
+  adcirc_alaska_ice_2d:
     path: adcirc/adcirc_alaska_ice-2d
     model: adcirc
     parallel: false
     hotstart: false
+    geographic: true
+    global: false
     output_files:
       - fort.63.nc
       - fort.64.nc
@@ -16,11 +18,13 @@ tests:
       - fort.221.inv
       - fort.222.inv
       - fort.225.inv
-  apes:
+  adcirc_apes:
     path: adcirc/adcirc_apes
     model: adcirc
     parallel: false
     hotstart: false
+    global: false
+    geographic: true
     output_files:
       - fort.61
       - fort.62
@@ -34,12 +38,14 @@ tests:
       - maxvel.63
       - maxwvel.63
       - minpr.63
-  apes-parallel:
+  adcirc_apes-parallel:
     path: adcirc/adcirc_apes-parallel
     model: adcirc
     parallel: true
     ncpu: 4
     hotstart: false
+    global: false
+    geographic: true
     output_files:
       - fort.61
       - fort.62
@@ -53,16 +59,18 @@ tests:
       - maxvel.63
       - maxwvel.63
       - minpr.63
-  baroclinic-2d-parallel:
+  adcirc_baroclinic-2d-parallel:
     path: adcirc/adcirc_baroclinic_2d_parallel
     model: adcirc
     parallel: true
     ncpu: 4
     hotstart: false
+    geographic: true
+    global: true
     output_files:
       - fort.63.nc
       - maxele.63.nc
-  baroclinic-2d-serial:
+  adcirc_baroclinic-2d-serial:
     path: adcirc/adcirc_baroclinic_2d_serial
     model: adcirc
     parallel: false
@@ -85,7 +93,7 @@ tests:
       - fort.64.nc
       - maxele.63.nc
       - maxvel.63.nc
-  global-tide+surge-2d:
+  adcirc_global-tide+surge-2d:
     path: adcirc/adcirc_global-tide+surge-2d
     model: adcirc
     parallel: false
@@ -106,7 +114,53 @@ tests:
     rm_files:
       - fort.221.inv
       - fort.222.inv
-  katrina-2d:
+  adcirc_global-tide+surge-netcdfsal-2d:
+    path: adcirc/adcirc_global-tide+surge-netcdfsal-2d
+    model: adcirc
+    parallel: false
+    hotstart: false
+    geographic: true
+    global: true
+    output_files:
+      - fort.61.nc
+      - fort.62.nc
+      - fort.63.nc
+      - fort.64.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - maxwvel.63.nc
+      - minpr.63.nc
+  adcirc_global-tide-2d:
+    path: adcirc/adcirc_global-tide-2d
+    model: adcirc
+    parallel: false
+    hotstart: false
+    geographic: true
+    global: true
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+  adcirc_global_nws10-2d:
+    path: adcirc/adcirc_global_nws10-2d
+    model: adcirc
+    parallel: false
+    hotstart: true
+    geographic: true
+    global: true
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - maxwvel.63.nc
+      - minpr.63.nc
+  adcirc_katrina-2d:
     path: adcirc/adcirc_katrina-2d
     model: adcirc
     parallel: false
@@ -122,7 +176,40 @@ tests:
       - maxvel.63.nc
       - maxwvel.63.nc
       - minpr.63.nc
-  quarterannular-2d:
+  adcirc_katrina-2d-parallel:
+    path: adcirc/adcirc_katrina-2d-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    global: false
+    geographic: true
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - maxwvel.63.nc
+      - minpr.63.nc
+  adcirc_katrina-2d-nws13:
+    path: adcirc/adcirc_katrina-2d-nws13
+    model: adcirc
+    parallel: false
+    hotstart: false
+    global: false
+    geographic: true
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - maxwvel.63.nc
+      - minpr.63.nc
+  adcirc_quarterannular-2d:
     path: adcirc/adcirc_quarterannular-2d
     model: adcirc
     parallel: false

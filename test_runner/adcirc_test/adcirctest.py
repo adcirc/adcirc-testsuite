@@ -132,19 +132,34 @@ class AdcircTest:
         Returns:
             None
         """
-        import os
-
         logger.info("Cleaning test directory")
+        if "hotstart" in self.__test_yaml and self.__test_yaml["hotstart"]:
+            coldstart_directory = self.__get_test_directory(True, False)
+            hotstart_directory = self.__get_test_directory(True, True)
+            self.__do_clean(coldstart_directory)
+            self.__do_clean(hotstart_directory)
+        else:
+            self.__do_clean(self.__test_directory)
+
+    def __do_clean(self, test_directory: str) -> None:
+        """
+        Clean the test directory
+
+        Args:
+            test_directory: Test directory to clean
+        """
+
+        import os
 
         if "rm_files" in self.__test_yaml:
             for file in self.__test_yaml["rm_files"]:
-                file_path = os.path.join(self.__test_directory, file)
+                file_path = os.path.join(test_directory, file)
                 if os.path.exists(file_path):
                     os.remove(file_path)
                     logger.info(f"Removed file: {file_path}")
 
         for file in self.__test_yaml["output_files"]:
-            file_path = os.path.join(self.__test_directory, file)
+            file_path = os.path.join(test_directory, file)
             if os.path.exists(file_path):
                 os.remove(file_path)
                 logger.info(f"Removed file: {file_path}")
@@ -157,10 +172,12 @@ class AdcircTest:
             True if the test passed, False otherwise
         """
         if "hotstart" in self.__test_yaml and self.__test_yaml["hotstart"]:
+            logger.info("Starting cold-start portion of the test")
             passed = self.__run_test(has_hotstart=True, is_hotstart=False)
             if not passed:
                 return False
             self.__copy_hotstart()
+            logger.info("Starting hot-start portion of the test")
             self.__run_test(has_hotstart=True, is_hotstart=True)
             if not passed:
                 return False
@@ -688,9 +705,26 @@ class AdcircTest:
         Returns:
             None
         """
-        import os
+        if "hotstart" in self.__test_yaml and self.__test_yaml["hotstart"]:
+            coldstart_directory = self.__get_test_directory(True, False)
+            hotstart_directory = self.__get_test_directory(True, True)
+            logger.info("Plotting cold-start results")
+            self.__plot_simulation(coldstart_directory)
+            logger.info("Plotting hot-start results")
+            self.__plot_simulation(hotstart_directory)
+        else:
+            logger.info("Plotting test results")
+            test_directory = self.__get_test_directory(False, False)
+            self.__plot_simulation(test_directory)
 
-        test_directory = self.__get_test_directory(False, False)
+    def __plot_simulation(self, test_directory: str) -> None:
+        """
+        Plot the simulation results in the test directory
+
+        Args:
+            test_directory: Test directory to plot the results
+        """
+        import os
 
         for file in self.__test_yaml["output_files"]:
             if "max" in file or "min" in file:
@@ -702,7 +736,7 @@ class AdcircTest:
                     mesh_file,
                     test_file,
                     control_file,
-                    self.__test_directory,
+                    test_directory,
                     self.__is_geographic,
                     self.__is_global,
                 )
@@ -710,7 +744,7 @@ class AdcircTest:
                 test_file = os.path.join(test_directory, file)
                 control_file = os.path.join(test_directory, "control", file)
                 AdcircTest.plot_station_files(
-                    self.__test, test_file, control_file, self.__test_directory
+                    self.__test, test_file, control_file, test_directory
                 )
 
     @staticmethod
