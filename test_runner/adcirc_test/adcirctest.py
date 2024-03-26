@@ -51,6 +51,8 @@ class AdcircTest:
         self.__root_dir = root_dir
         self.__executable, self.__prep_executable = self.__find_executable()
         self.__test_directory = self.__find_test_directory()
+        self.__is_global = self.__test_yaml.get("global", False)
+        self.__is_geographic = self.__test_yaml.get("geographic", False)
 
         logger.debug(f"AdcircTest object created for test: {test}")
         logger.debug(f"Executable: {self.__executable}")
@@ -472,6 +474,10 @@ class AdcircTest:
                 msg = f"Variable {var} not found in test file"
                 raise ValueError(msg)
 
+            # Only compare numeric types
+            if control[var].dtype.kind not in "fi":
+                continue
+
             # Check that the variables are the same and get the maximum difference
             try:
                 npt.assert_allclose(
@@ -687,7 +693,7 @@ class AdcircTest:
         test_directory = self.__get_test_directory(False, False)
 
         for file in self.__test_yaml["output_files"]:
-            if "max" in file:
+            if "max" in file or "min" in file:
                 mesh_file = os.path.join(test_directory, "fort.14")
                 test_file = os.path.join(test_directory, file)
                 control_file = os.path.join(test_directory, "control", file)
@@ -697,8 +703,10 @@ class AdcircTest:
                     test_file,
                     control_file,
                     self.__test_directory,
+                    self.__is_geographic,
+                    self.__is_global,
                 )
-            elif "fort.61" in file:
+            elif "fort.61" in file or "fort.62" in file:
                 test_file = os.path.join(test_directory, file)
                 control_file = os.path.join(test_directory, "control", file)
                 AdcircTest.plot_station_files(
@@ -712,6 +720,8 @@ class AdcircTest:
         test_file: str,
         control_file: str,
         output_directory: str,
+        is_geographic: bool,
+        is_global: bool,
     ) -> None:
         """
         Plot the maximum difference between two files
@@ -722,13 +732,14 @@ class AdcircTest:
             test_file: Name of the test file
             control_file: Name of the control file
             output_directory: Directory to output the plots
+            is_geographic: If the mesh is in geographic coordinates
+            is_global: If the mesh is global
 
         Returns:
             None
         """
         import os
         import matplotlib.pyplot as plt
-        from matplotlib.tri import Triangulation
 
         control_data, test_data, var = AdcircTest.__get_test_data(
             mesh_file, control_file, test_file
@@ -754,26 +765,94 @@ class AdcircTest:
         plt.savefig(os.path.join(output_directory, f"max_value_{var}_histogram.png"))
         plt.close(fig)
 
-        # ...Plot the data at the node locations using the mesh triangle information
-        tri = Triangulation(
-            control_data["x"], control_data["y"], control_data["element"] - 1
-        )
-
-        fig, ax = plt.subplots()
-        ax.set_aspect("equal")
+        x = control_data["x"].to_numpy()
+        y = control_data["y"].to_numpy()
 
         # Contour the data with symmetrical limits around the max difference
         diff = control_data[var].values[0, :, 0] - test_data[var].values[0, :, 0]
-        max_diff = np.nanmax(np.abs(diff))
-        if max_diff == 0:
-            max_diff = 0.1
 
+        # Compute the value of the 95th percentile difference
+        max_diff = np.nanmax(np.abs(diff))
         max_val = np.nanmax(test_data[var].values[0, :, 0])
         min_val = np.nanmin(test_data[var].values[0, :, 0])
 
         if max_val == min_val:
             min_val -= 0.1
             max_val += 0.1
+            max_95 = max_val
+            min_5 = min_val
+        else:
+            max_95 = np.percentile(test_data[var].values[0, :, 0], 95)
+            min_5 = np.percentile(test_data[var].values[0, :, 0], 5)
+
+        if max_diff == 0:
+            percentile_95 = 0.1
+        else:
+            percentile_95 = np.percentile(np.abs(diff), 95)
+
+        diff_contour_levels = np.linspace(-percentile_95, percentile_95, 100)
+        diff_ticks = np.linspace(-percentile_95, percentile_95, 11)
+        contour_levels = np.linspace(min_5, max_95, 100)
+        contour_ticks = np.linspace(min_5, max_95, 11)
+
+        if is_geographic:
+            AdcircTest.__plot_maps_geographic(
+                test_name,
+                x,
+                y,
+                test_data,
+                control_data,
+                diff,
+                var,
+                contour_levels,
+                contour_ticks,
+                diff_contour_levels,
+                diff_ticks,
+                output_directory,
+                is_global,
+            )
+        else:
+            AdcircTest.__plot_data_cartesian(
+                test_name,
+                var,
+                x,
+                y,
+                test_data,
+                control_data,
+                diff,
+                contour_levels,
+                contour_ticks,
+                diff_contour_levels,
+                diff_ticks,
+                output_directory,
+            )
+
+    @staticmethod
+    def __plot_data_cartesian(
+        test_name,
+        var,
+        x,
+        y,
+        test_data,
+        control_data,
+        diff,
+        contour_levels,
+        contour_ticks,
+        diff_contour_levels,
+        diff_ticks,
+        output_directory,
+    ):
+        import os
+        import matplotlib.pyplot as plt
+        from matplotlib.tri import Triangulation
+
+        fig, ax = plt.subplots()
+        fig.set_size_inches(12, 8)
+        ax.set_aspect("equal")
+        tri = Triangulation(x, y, control_data["element"] - 1)
+        percentile_95 = np.percentile(np.abs(diff), 95)
+        min_5 = np.percentile(test_data[var].values[0, :, 0], 5)
+        max_95 = np.percentile(test_data[var].values[0, :, 0], 95)
 
         # If there are less than 1000 elements, plot the triangles
         if control_data["element"].size < 1000:
@@ -781,12 +860,6 @@ class AdcircTest:
             alpha = 0.7
         else:
             alpha = 1.0
-
-        diff_contour_levels = np.linspace(-max_diff, max_diff, 100)
-        diff_ticks = np.linspace(-max_diff, max_diff, 11)
-        contour_levels = np.linspace(min_val, max_val, 100)
-        contour_ticks = np.linspace(min_val, max_val, 11)
-
         diff_contour = ax.tricontourf(
             tri,
             diff,
@@ -794,22 +867,19 @@ class AdcircTest:
             extend="both",
             levels=diff_contour_levels,
             alpha=alpha,
-            vmin=-max_diff,
-            vmax=max_diff,
+            vmin=-percentile_95,
+            vmax=percentile_95,
         )
         ax.set_xlabel("X")
         ax.set_ylabel("Y")
         ax.grid(True)
-
         cbar = plt.colorbar(
             diff_contour, orientation="vertical", ax=ax, ticks=diff_ticks
         )
         cbar.set_label("Difference")
-
         ax.set_title(f"Max Difference for {var}")
         plt.savefig(os.path.join(output_directory, f"max_diff_{var}_contour.png"))
         plt.close(fig)
-
         # Plot the test data
         fig, ax = plt.subplots()
         ax.set_aspect("equal")
@@ -819,8 +889,8 @@ class AdcircTest:
             cmap="viridis",
             levels=contour_levels,
             alpha=alpha,
-            vmin=min_val,
-            vmax=max_val,
+            vmin=min_5,
+            vmax=max_95,
         )
         ax.set_xlabel("X")
         ax.set_ylabel("Y")
@@ -828,8 +898,141 @@ class AdcircTest:
         ax.set_title(f"Test: {test_name}, {var}")
         cbar = plt.colorbar(contour, orientation="vertical", ax=ax, ticks=contour_ticks)
         cbar.set_label(var)
-        plt.savefig(os.path.join(output_directory, f"test_{var}_contour.png"))
+        plt.savefig(
+            os.path.join(output_directory, f"test_{var}_contour.png"),
+            dpi=300,
+            bbox_inches="tight",
+        )
         plt.close(fig)
+
+    @staticmethod
+    def __plot_maps_geographic(
+        test_name,
+        x,
+        y,
+        test_data,
+        control_data,
+        diff,
+        var,
+        contour_levels,
+        contour_ticks,
+        diff_contour_levels,
+        diff_ticks,
+        output_directory,
+        is_global,
+    ):
+        import os
+        import pyproj
+        import matplotlib.pyplot as plt
+        from matplotlib.tri import Triangulation, LinearTriInterpolator
+        from mpl_toolkits.basemap import Basemap
+
+        x_min = np.nanmin(test_data["x"].to_numpy())
+        x_max = np.nanmax(test_data["x"].to_numpy())
+        y_min = np.nanmin(test_data["y"].to_numpy())
+        y_max = np.nanmax(test_data["y"].to_numpy())
+        parallels = np.linspace(y_min, y_max, 5)
+        meridians = np.linspace(x_min, x_max, 5)
+        parallels = np.round(parallels, 1)
+        meridians = np.round(meridians, 1)
+        crs_wgs = pyproj.CRS("EPSG:4326")
+        crs_stereo = pyproj.CRS("EPSG:32661")
+        transformer_toster = pyproj.Transformer.from_crs(
+            crs_wgs, crs_stereo, always_xy=True
+        )
+        x_s, y_s = transformer_toster.transform(x, y)
+        # Interpolate the data onto a regular grid
+        x_g, y_g = np.meshgrid(
+            np.linspace(np.min(x), np.max(x), 500),
+            np.linspace(np.min(y), np.max(y), 500),
+        )
+        x_sg, y_sg = transformer_toster.transform(x_g, y_g)
+        tri = Triangulation(x_s, y_s, control_data["element"] - 1)
+        diff_zi = LinearTriInterpolator(tri, diff)(x_sg, y_sg)
+        zi = LinearTriInterpolator(tri, test_data[var].values[0, :, 0])(x_sg, y_sg)
+        fig, ax = plt.subplots()
+        fig.set_size_inches(12, 8)
+
+        if x_max - x_min > 100:
+            res = "i"
+        elif x_max - x_min > 30:
+            res = "h"
+        else:
+            res = "f"
+
+        if is_global:
+            m = Basemap(
+                projection="robin",
+                lon_0=(x_min + x_max) / 2,
+                lat_0=(y_min + y_max) / 2,
+                llcrnrlon=x_min,
+                llcrnrlat=y_min,
+                urcrnrlon=x_max,
+                urcrnrlat=y_max,
+                resolution=res,
+            )
+        else:
+            m = Basemap(
+                projection="merc",
+                lon_0=(x_min + x_max) / 2,
+                lat_0=(y_min + y_max) / 2,
+                llcrnrlon=x_min,
+                llcrnrlat=y_min,
+                urcrnrlon=x_max,
+                urcrnrlat=y_max,
+                resolution=res,
+            )
+        m.drawcoastlines()
+        m.drawcountries()
+        m.drawparallels(parallels, labels=[1, 0, 0, 0])
+        m.drawmeridians(meridians, labels=[0, 0, 0, 1])
+        x_m, y_m = m(x_g, y_g)
+        m.contourf(
+            x_m, y_m, diff_zi, levels=diff_contour_levels, cmap="bwr", extend="both"
+        )
+        cbar = m.colorbar(location="right", ticks=diff_ticks)
+        cbar.set_label("Difference")
+        ax.set_title(f"Max Difference for {var}")
+        plt.savefig(os.path.join(output_directory, f"max_diff_{var}_contour.png"))
+        plt.close(fig)
+        fig, ax = plt.subplots()
+
+        if is_global:
+            m = Basemap(
+                projection="robin",
+                lon_0=(x_min + x_max) / 2,
+                lat_0=(y_min + y_max) / 2,
+                llcrnrlon=x_min,
+                llcrnrlat=y_min,
+                urcrnrlon=x_max,
+                urcrnrlat=y_max,
+                resolution=res,
+            )
+        else:
+            m = Basemap(
+                projection="merc",
+                lon_0=(x_min + x_max) / 2,
+                lat_0=(y_min + y_max) / 2,
+                llcrnrlon=x_min,
+                llcrnrlat=y_min,
+                urcrnrlon=x_max,
+                urcrnrlat=y_max,
+                resolution=res,
+            )
+        m.drawcoastlines()
+        m.drawcountries()
+        m.drawparallels(parallels, labels=[1, 0, 0, 0])
+        m.drawmeridians(meridians, labels=[0, 0, 0, 1])
+        x_m, y_m = m(x_g, y_g)
+        m.contourf(x_m, y_m, zi, levels=contour_levels, cmap="viridis", extend="both")
+        cbar = m.colorbar(location="right", ticks=contour_ticks)
+        cbar.set_label(var)
+        ax.set_title(f"Test: {test_name}, {var}")
+        plt.savefig(
+            os.path.join(output_directory, f"test_{var}_contour.png"),
+            dpi=300,
+            bbox_inches="tight",
+        )
 
     @staticmethod
     def plot_station_files(
@@ -862,6 +1065,11 @@ class AdcircTest:
 
         for i in range(control_data["node"].size):
 
+            if var == "u-vel":
+                var_name = "uv_mag"
+            else:
+                var_name = var
+
             if control_data[var].shape[2] == 2:
                 control_var = np.sqrt(
                     control_data[var][:, i, 0].to_numpy() ** 2
@@ -879,11 +1087,15 @@ class AdcircTest:
             ax.plot(control_time, control_var, label="Control")
             ax.plot(test_time, test_var, label="Test")
             ax.set_xlabel("Time (days)")
-            ax.set_ylabel(var)
+            ax.set_ylabel(var_name)
             ax.grid(True)
             ax.legend()
-            ax.set_title(f"Station {i}, {var}, Test: {test_name}")
-            plt.savefig(os.path.join(output_directory, f"station_{i}_{var}.png"))
+            ax.set_title(f"Station {i}, {var_name}, Test: {test_name}")
+            plt.savefig(
+                os.path.join(output_directory, f"station_{i}_{var_name}.png"),
+                dpi=300,
+                bbox_inches="tight",
+            )
             plt.close(fig)
 
     @staticmethod
@@ -937,8 +1149,12 @@ class AdcircTest:
             var = "vel_max"
         elif "maxwvel" in test_file:
             var = "wind_max"
+        elif "minpr" in test_file:
+            var = "pressure_min"
         elif "fort.61" in test_file:
             var = "zeta"
+        elif "fort.62" in test_file:
+            var = "u-vel"
         else:
             msg = f"Variable not known for file {test_file}"
             raise ValueError(msg)
@@ -957,24 +1173,21 @@ class AdcircTest:
                 "time": temp_dataset["time"],
                 "x": temp_dataset["x"],
                 "y": temp_dataset["y"],
-                "element": temp_dataset["element"],
             }
         )
+
+        if "element" in temp_dataset:
+            dataset["element"] = temp_dataset["element"]
 
         if variable == "u-vel":
             u = temp_dataset["u-vel"].to_numpy()
             v = temp_dataset["v-vel"].to_numpy()
-            uv = np.column_stack((u, v))
-
-            if len(u.shape) == 1:
-                uv_shaped = uv.reshape((1, uv.shape[0], 2))
-            elif len(u.shape) == 2:
-                uv_shaped = uv.reshape((uv.shape[0], uv.shape[1], 2))
-            else:
-                uv_shaped = uv
+            uv = np.full((u.shape[0], u.shape[1], 2), np.nan)
+            uv[:, :, 0] = u
+            uv[:, :, 1] = v
 
             dataset[variable] = xr.DataArray(
-                data=uv_shaped,
+                data=uv,
                 dims=["time", "node", "n_values"],
             )
         else:

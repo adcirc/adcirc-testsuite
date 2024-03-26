@@ -53,7 +53,7 @@ tests:
       - maxvel.63
       - maxwvel.63
       - minpr.63
-  baroclinic_2d_parallel:
+  baroclinic-2d-parallel:
     path: adcirc/adcirc_baroclinic_2d_parallel
     model: adcirc
     parallel: true
@@ -62,11 +62,13 @@ tests:
     output_files:
       - fort.63.nc
       - maxele.63.nc
-  baroclinic_2d_serial:
+  baroclinic-2d-serial:
     path: adcirc/adcirc_baroclinic_2d_serial
     model: adcirc
     parallel: false
     hotstart: false
+    geographic: true
+    global: true
     output_files:
       - fort.63.nc
       - maxele.63.nc
@@ -76,11 +78,50 @@ tests:
     parallel: true
     ncpu: 4
     hotstart: false
+    global: true
+    geographic: true
     output_files:
       - fort.63.nc
       - fort.64.nc
       - maxele.63.nc
       - maxvel.63.nc
+  global-tide+surge-2d:
+    path: adcirc/adcirc_global-tide+surge-2d
+    model: adcirc
+    parallel: false
+    hotstart: false
+    geographic: true
+    global: true
+    output_files:
+      - fort.61.nc
+      - fort.62.nc
+      - fort.63.nc
+      - fort.64.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - maxwvel.63.nc
+      - minpr.63.nc
+    rm_files:
+      - fort.221.inv
+      - fort.222.inv
+  katrina-2d:
+    path: adcirc/adcirc_katrina-2d
+    model: adcirc
+    parallel: false
+    hotstart: false
+    global: false
+    geographic: true
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - maxwvel.63.nc
+      - minpr.63.nc
   quarterannular-2d:
     path: adcirc/adcirc_quarterannular-2d
     model: adcirc
