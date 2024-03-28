@@ -9,6 +9,9 @@ logging.basicConfig(
 
 
 def adcirc_testsuite_runner():
+    """
+    Main entrypoint for running the ADCIRC test suite
+    """
     import argparse
     import yaml
     import os
@@ -48,7 +51,8 @@ def adcirc_testsuite_runner():
     passed = this_test.run()
     this_test.plot()
     if not passed:
-        raise ValueError(f"Test {test_name} failed")
+        msg = f"Test {test_name} failed"
+        raise ValueError(msg)
 
 
 if __name__ == "__main__":

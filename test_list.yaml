@@ -160,6 +160,57 @@ tests:
       - maxvel.63.nc
       - maxwvel.63.nc
       - minpr.63.nc
+  adcirc_ideal_channel-2d-parallel:
+    path: adcirc/adcirc_ideal_channel-2d-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+  adcirc_ideal_channel-woffset-2d-parallel:
+    path: adcirc/adcirc_ideal_channel-woffset-2d-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+  adcirc_internal_overflow:
+    path: adcirc/adcirc_internal_overflow
+    model: adcirc
+    parallel: false
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+  adcirc_internal_overflow-parallel:
+    path: adcirc/adcirc_internal_overflow-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
   adcirc_katrina-2d:
     path: adcirc/adcirc_katrina-2d
     model: adcirc
@@ -209,6 +260,68 @@ tests:
       - maxvel.63.nc
       - maxwvel.63.nc
       - minpr.63.nc
+  adcirc_katrina-2d-nws13-parallel:
+    path: adcirc/adcirc_katrina-2d-nws13-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    global: false
+    geographic: true
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - maxwvel.63.nc
+      - minpr.63.nc
+  adcirc_nws30_wlcorrection:
+    path: adcirc/adcirc_nws30_wlcorrection
+    model: adcirc
+    parallel: false
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.61
+      - fort.62
+      - fort.63
+      - fort.64
+      - fort.71.nc
+      - fort.72.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63
+      - maxvel.63
+      - maxwvel.63.nc
+      - minpr.63.nc
+      - dynamicWaterLevelCorrection.61
+      - dynamicWaterLevelCorrection.63
+  adcirc_nws30_wlcorrection-parallel:
+    path: adcirc/adcirc_nws30_wlcorrection-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.61.nc
+      - fort.62.nc
+      - fort.63.nc
+      - fort.64.nc
+      - fort.71.nc
+      - fort.72.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - maxwvel.63.nc
+      - minpr.63.nc
+      - dynamicWaterLevelCorrection.61.nc
+      - dynamicWaterLevelCorrection.63.nc
   adcirc_quarterannular-2d:
     path: adcirc/adcirc_quarterannular-2d
     model: adcirc
@@ -221,4 +334,215 @@ tests:
       - fort.64
       - maxele.63
       - maxvel.63
-
+  adcirc_quarterannular-2d-hotstart:
+    path: adcirc/adcirc_quarterannular-2d-hotstart
+    model: adcirc
+    parallel: false
+    hotstart: true
+    output_files:
+      - fort.61
+      - fort.62
+      - fort.63
+      - fort.64
+      - maxele.63
+      - maxvel.63
+  adcirc_quarterannular-2d-netcdf:
+    path: adcirc/adcirc_quarterannular-2d-netcdf
+    model: adcirc
+    parallel: false
+    hotstart: false
+    output_files:
+      - fort.61.nc
+      - fort.62.nc
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+  adcirc_quarterannular-2d-parallel:
+    path: adcirc/adcirc_quarterannular-2d-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    output_files:
+      - fort.61
+      - fort.62
+      - fort.63
+      - fort.64
+      - maxele.63
+      - maxvel.63
+  adcirc_quarterannular-2d-parallel-hotstart:
+    path: adcirc/adcirc_quarterannular-2d-parallel-hotstart
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: true
+    output_files:
+      - fort.61
+      - fort.62
+      - fort.63
+      - fort.64
+      - maxele.63
+      - maxvel.63
+  adcirc_quarterannular-2d-parallel-netcdf:
+    path: adcirc/adcirc_quarterannular-2d-parallel-netcdf
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    output_files:
+      - fort.61.nc
+      - fort.62.nc
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+  adcirc_quarterannular-2d-parallel-netcdf-hotstart:
+    path: adcirc/adcirc_quarterannular-2d-parallel-netcdf-hotstart
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: true
+    output_files:
+      - fort.61.nc
+      - fort.62.nc
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+  adcirc_quarterannular-2d-parallel-netcdf-writer:
+    path: adcirc/adcirc_quarterannular-2d-parallel-netcdf-writer
+    model: adcirc
+    parallel: true
+    ncpu: 3
+    n_writer: 1
+    hotstart: false
+    output_files:
+      - fort.61.nc
+      - fort.62.nc
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+  adcirc_quarterannular-2d-parallel-writer:
+    path: adcirc/adcirc_quarterannular-2d-parallel-writer
+    model: adcirc
+    parallel: true
+    ncpu: 3
+    n_writer: 1
+    hotstart: false
+    output_files:
+      - fort.61
+      - fort.62
+      - fort.63
+      - fort.64
+      - maxele.63
+      - maxvel.63
+  adcirc_rivers:
+    path: adcirc/adcirc_rivers
+    model: adcirc
+    parallel: false
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+  adcirc_rivers-parallel:
+    path: adcirc/adcirc_rivers-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+  adcirc_shinnecock_inlet:
+    path: adcirc/adcirc_shinnecock_inlet
+    model: adcirc
+    parallel: false
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63
+      - fort.64
+      - maxele.63
+      - maxvel.63
+  adcirc_shinnecock_inlet-parallel:
+    path: adcirc/adcirc_shinnecock_inlet-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63
+      - fort.64
+      - maxele.63
+      - maxvel.63
+  adcirc_slopingbeach_vew1d-parallel:
+    path: adcirc/adcirc_slopingbeach_vew1d-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    geographic: false
+    global: false
+    output_files:
+      - fort.61.nc
+      - fort.62.nc
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+  adcirc_subgrid-parallel:
+    path: adcirc/adcirc_subgrid-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.61.nc
+      - fort.62.nc
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+  adcirc_subgrid-serial:
+    path: adcirc/adcirc_subgrid-serial
+    model: adcirc
+    parallel: false
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.61.nc
+      - fort.62.nc
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+  adcirc_timevaryingweirs-parallel:
+    path: adcirc/adcirc_timevaryingweirs-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - fort.77
+      - maxele.63.nc
+      - maxvel.63.nc

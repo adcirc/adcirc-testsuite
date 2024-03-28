@@ -3,6 +3,7 @@ from typing import Tuple, Union
 
 import numpy as np
 import xarray as xr
+from matplotlib.tri import Triangulation
 
 logger = logging.getLogger(__name__)
 
@@ -816,13 +817,22 @@ class AdcircTest:
             max_95 = max_val
             min_5 = min_val
         else:
-            max_95 = np.percentile(test_data[var].values[0, :, 0], 95)
-            min_5 = np.percentile(test_data[var].values[0, :, 0], 5)
+            valid_points = np.where(~np.isnan(test_data[var].values[0, :, 0]))
+            valid_data = test_data[var].values[0, :, 0][valid_points]
+            max_95 = np.nanpercentile(valid_data, 95)
+            min_5 = np.nanpercentile(valid_data, 5)
+            if max_95 == min_5:
+                min_5 -= 0.1
+                max_95 += 0.1
 
         if max_diff == 0:
             percentile_95 = 0.1
         else:
-            percentile_95 = np.percentile(np.abs(diff), 95)
+            valid_points = np.where(~np.isnan(diff))
+            valid_diff = diff[valid_points]
+            percentile_95 = np.nanpercentile(valid_diff, 95)
+            if percentile_95 == 0.0:
+                percentile_95 = 0.1
 
         diff_contour_levels = np.linspace(-percentile_95, percentile_95, 100)
         diff_ticks = np.linspace(-percentile_95, percentile_95, 11)
@@ -878,15 +888,17 @@ class AdcircTest:
     ):
         import os
         import matplotlib.pyplot as plt
-        from matplotlib.tri import Triangulation
 
         fig, ax = plt.subplots()
         fig.set_size_inches(12, 8)
         ax.set_aspect("equal")
         tri = Triangulation(x, y, control_data["element"] - 1)
-        percentile_95 = np.percentile(np.abs(diff), 95)
-        min_5 = np.percentile(test_data[var].values[0, :, 0], 5)
-        max_95 = np.percentile(test_data[var].values[0, :, 0], 95)
+        percentile_95 = np.nanpercentile(np.abs(diff), 95)
+        min_5 = np.nanpercentile(test_data[var].values[0, :, 0], 5)
+        max_95 = np.nanpercentile(test_data[var].values[0, :, 0], 95)
+
+        if percentile_95 == 0.0:
+            percentile_95 = 0.1
 
         # If there are less than 1000 elements, plot the triangles
         if control_data["element"].size < 1000:
@@ -894,8 +906,11 @@ class AdcircTest:
             alpha = 0.7
         else:
             alpha = 1.0
+
+        # ... Generate a mask for the nan values
+        tri_masked = AdcircTest.get_masked_triangulation(tri, diff)
         diff_contour = ax.tricontourf(
-            tri,
+            tri_masked,
             diff,
             cmap="bwr",
             extend="both",
@@ -914,11 +929,13 @@ class AdcircTest:
         ax.set_title(f"Max Difference for {var}")
         plt.savefig(os.path.join(output_directory, f"max_diff_{var}_contour.png"))
         plt.close(fig)
+
         # Plot the test data
         fig, ax = plt.subplots()
         ax.set_aspect("equal")
+        tri_masked = AdcircTest.get_masked_triangulation(tri, test_data[var].values[0, :, 0])
         contour = ax.tricontourf(
-            tri,
+            tri_masked,
             test_data[var].values[0, :, 0],
             cmap="viridis",
             levels=contour_levels,
@@ -1335,3 +1352,74 @@ class AdcircTest:
         dataset["time"] = xr.DataArray(time_data, dims=["time"])
 
         return dataset
+
+    @staticmethod
+    def shift_duplicate_nodes(
+        x: np.array, y: np.array, elements: np.array
+    ) -> Tuple[np.array, np.array]:
+        """
+        Shift the duplicate points
+
+        Args:
+            x: x coordinates
+            y: y coordinates
+            elements: Elements
+        """
+        import numpy as np
+        from scipy.spatial import cKDTree
+
+        # Get the unique nodes
+        is_duplicate = np.full(x.size, False)
+
+        # Flag the duplicate nodes by checking if another
+        # point exists with duplicate coordinates
+        tree = cKDTree(np.column_stack((x, y)))
+        for i in range(x.size):
+            dst, idx = tree.query((x[i], y[i]), k=2)
+            if dst[1] < 1e-6:
+                is_duplicate[i] = True
+
+        # Print the count of duplicate nodes
+        n_duplicates = np.sum(is_duplicate)
+
+        if n_duplicates > 0:
+            logging.info(f"Number of duplicate nodes: {n_duplicates}")
+        else:
+            return x, y
+
+        # If the node is duplicated, shift it slightly toward the center
+        # of the nearest element center
+        element_centers = np.zeros((elements.shape[0], 2))
+        for i in range(elements.shape[0]):
+            element_centers[i, 0] = np.mean(x[elements[i, :]])
+            element_centers[i, 1] = np.mean(y[elements[i, :]])
+
+        center_tree = cKDTree(element_centers)
+        for i in range(x.size):
+            if is_duplicate[i]:
+                dst, idx = center_tree.query((x[i], y[i]))
+                shift_x = 0.1 * (element_centers[idx, 0] - x[i])
+                shift_y = 0.1 * (element_centers[idx, 1] - y[i])
+                x[i] += shift_x
+                y[i] += shift_y
+
+        return x, y
+
+    @staticmethod
+    def get_masked_triangulation(t: Triangulation, data: np.array) -> Triangulation:
+        """
+        Get a masked triangulation based on the data
+
+        Args:
+            t: Triangulation
+            data: Data
+
+        Returns:
+            Masked triangulation
+        """
+        masked_nodes = np.where(np.isnan(data))[0]
+        mask = np.full(t.triangles.shape[0], False)
+        for i in range(t.triangles.shape[0]):
+            if np.any(np.isin(t.triangles[i, :], masked_nodes)):
+                mask[i] = True
+        return Triangulation(t.x, t.y, t.triangles, mask=mask)
