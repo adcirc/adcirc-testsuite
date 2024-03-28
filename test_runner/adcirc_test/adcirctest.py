@@ -1202,6 +1202,10 @@ class AdcircTest:
             var = "wind_max"
         elif "minpr" in test_file:
             var = "pressure_min"
+        elif "swan_HS_max" in test_file:
+            var = "swan_hs_max"
+        elif "swan_TPS_max" in test_file:
+            var = "swan_tps_max"
         elif "fort.61" in test_file:
             var = "zeta"
         elif "fort.62" in test_file:

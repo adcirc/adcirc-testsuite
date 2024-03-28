@@ -546,3 +546,21 @@ tests:
       - fort.77
       - maxele.63.nc
       - maxvel.63.nc
+  adcirc_swan_apes_irene:
+    path: adcirc-swan/adcirc_swan_apes_irene
+    model: adcirc+swan
+    parallel: false
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63
+      - fort.64
+      - fort.73
+      - fort.74
+      - maxele.63
+      - maxvel.63
+      - maxwvel.63
+      - minpr.63
+      - swan_HS_max.63
+      - swan_TPS_max.63

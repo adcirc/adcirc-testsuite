@@ -19,6 +19,3 @@ python3 $TESTHOME/test_runner/test_runner.py \
     --test-root $TESTHOME \
     --test-yaml $TESTHOME/test_list.yaml \
     --test $case
-
-#...Exit with status zero if all tests have passed
-exit 0
