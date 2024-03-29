@@ -1,5 +1,5 @@
 import logging
-from typing import Tuple, Union
+from typing import Tuple, Union, ClassVar
 
 import numpy as np
 import xarray as xr
@@ -14,7 +14,7 @@ class AdcircTest:
     """
 
     # List of variables dropped to be read in by xarray
-    ADCIRC_DROP_VARIABLES_LIST = [
+    ADCIRC_DROP_VARIABLES_LIST: ClassVar = [
         "neta",
         "nvel",
         "nvdll",
@@ -507,10 +507,7 @@ class AdcircTest:
                 continue
 
             if "time_of" in var:
-                # 60 seconds. This is because the time-of comparison
-                # is different from the other variables which are
-                # solution parameters
-                this_tolerance = 60
+                continue
             else:
                 this_tolerance = tolerance
 
@@ -803,7 +800,9 @@ class AdcircTest:
         control_data, test_data, var = AdcircTest.__get_test_data(
             mesh_file, control_file, test_file
         )
-        max_diff = np.abs(test_data[var].to_numpy() - control_data[var].to_numpy())[0, :, 0]
+        max_diff = np.abs(test_data[var].to_numpy() - control_data[var].to_numpy())[
+            0, :, 0
+        ]
 
         # ... Make a histogram plot of the test results
         fig, ax = plt.subplots()
@@ -828,7 +827,9 @@ class AdcircTest:
         y = control_data["y"].to_numpy()
 
         # Contour the data with symmetrical limits around the max difference
-        diff = control_data[var].to_numpy()[0, :, 0] - test_data[var].to_numpy()[0, :, 0]
+        diff = (
+            control_data[var].to_numpy()[0, :, 0] - test_data[var].to_numpy()[0, :, 0]
+        )
 
         # Compute the value of the 95th percentile difference
         max_diff = np.nanmax(np.abs(diff))

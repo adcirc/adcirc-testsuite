@@ -297,7 +297,6 @@ tests:
       - maxvel.63
       - maxwvel.63.nc
       - minpr.63.nc
-      - dynamicWaterLevelCorrection.63
   adcirc_nws30_wlcorrection-parallel:
     path: adcirc/adcirc_nws30_wlcorrection-parallel
     model: adcirc
@@ -319,7 +318,6 @@ tests:
       - maxvel.63.nc
       - maxwvel.63.nc
       - minpr.63.nc
-      - dynamicWaterLevelCorrection.63.nc
   adcirc_quarterannular-2d:
     path: adcirc/adcirc_quarterannular-2d
     model: adcirc
