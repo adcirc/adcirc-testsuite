@@ -1,5 +1,5 @@
 tests:
-  adcirc_alaska_ice_2d:
+  adcirc_alaska_ice-2d:
     path: adcirc/adcirc_alaska_ice-2d
     model: adcirc
     parallel: false
@@ -59,7 +59,7 @@ tests:
       - maxvel.63
       - maxwvel.63
       - minpr.63
-  adcirc_baroclinic-2d-parallel:
+  adcirc_baroclinic_2d_parallel:
     path: adcirc/adcirc_baroclinic_2d_parallel
     model: adcirc
     parallel: true
@@ -70,7 +70,7 @@ tests:
     output_files:
       - fort.63.nc
       - maxele.63.nc
-  adcirc_baroclinic-2d-serial:
+  adcirc_baroclinic_2d_serial:
     path: adcirc/adcirc_baroclinic_2d_serial
     model: adcirc
     parallel: false
@@ -194,10 +194,10 @@ tests:
     geographic: true
     global: false
     output_files:
-      - fort.63.nc
-      - fort.64.nc
-      - maxele.63.nc
-      - maxvel.63.nc
+      - fort.63
+      - fort.64
+      - maxele.63
+      - maxvel.63
   adcirc_internal_overflow-parallel:
     path: adcirc/adcirc_internal_overflow-parallel
     model: adcirc
@@ -207,10 +207,10 @@ tests:
     geographic: true
     global: false
     output_files:
-      - fort.63.nc
-      - fort.64.nc
-      - maxele.63.nc
-      - maxvel.63.nc
+      - fort.63
+      - fort.64
+      - maxele.63
+      - maxvel.63
   adcirc_katrina-2d:
     path: adcirc/adcirc_katrina-2d
     model: adcirc
@@ -297,7 +297,6 @@ tests:
       - maxvel.63
       - maxwvel.63.nc
       - minpr.63.nc
-      - dynamicWaterLevelCorrection.61
       - dynamicWaterLevelCorrection.63
   adcirc_nws30_wlcorrection-parallel:
     path: adcirc/adcirc_nws30_wlcorrection-parallel
@@ -320,7 +319,6 @@ tests:
       - maxvel.63.nc
       - maxwvel.63.nc
       - minpr.63.nc
-      - dynamicWaterLevelCorrection.61.nc
       - dynamicWaterLevelCorrection.63.nc
   adcirc_quarterannular-2d:
     path: adcirc/adcirc_quarterannular-2d
@@ -390,6 +388,18 @@ tests:
     parallel: true
     ncpu: 4
     hotstart: false
+    output_files:
+      - fort.61.nc
+      - fort.62.nc
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+  adcirc_quarterannular-2d-netcdf-hotstart:
+    path: adcirc/adcirc_quarterannular-2d-netcdf-hotstart
+    model: adcirc
+    parallel: false
+    hotstart: true
     output_files:
       - fort.61.nc
       - fort.62.nc

@@ -165,29 +165,31 @@ class AdcircTest:
                 os.remove(file_path)
                 logger.info(f"Removed file: {file_path}")
 
-    def run(self) -> bool:
+    def run(self) -> dict:
         """
         Run the test
 
         Returns:
             True if the test passed, False otherwise
         """
+        status = {"overall": {"passed": False}}
+
         if "hotstart" in self.__test_yaml and self.__test_yaml["hotstart"]:
             logger.info("Starting cold-start portion of the test")
-            passed = self.__run_test(has_hotstart=True, is_hotstart=False)
-            if not passed:
-                return False
+            status["coldstart"] = self.__run_test(has_hotstart=True, is_hotstart=False)
+            if not status["coldstart"]["passed"]:
+                return status
             self.__copy_hotstart()
             logger.info("Starting hot-start portion of the test")
-            self.__run_test(has_hotstart=True, is_hotstart=True)
-            if not passed:
-                return False
+            status["hotstart"] = self.__run_test(has_hotstart=True, is_hotstart=True)
+            status["overall"]["passed"] = (
+                status["coldstart"]["passed"] and status["hotstart"]["passed"]
+            )
         else:
-            passed = self.__run_test(has_hotstart=False, is_hotstart=False)
-            if not passed:
-                return False
+            status["coldstart"] = self.__run_test(has_hotstart=False, is_hotstart=False)
+            status["overall"]["passed"] = status["coldstart"]["passed"]
 
-        return True
+        return status
 
     def __copy_hotstart(self) -> None:
         """
@@ -212,8 +214,11 @@ class AdcircTest:
             if os.path.exists(file_cold):
                 shutil.copy(file_cold, file_hot)
                 logger.info(f"Copied hotstart file: {file_cold} to {file_hot}")
+            elif os.path.exists(os.path.join("PE0000", file_cold)):
+                shutil.copy(os.path.join("PE0000", file_cold), file_hot)
+                logger.info(f"Copied hotstart file: {file_cold} to {file_hot}")
 
-    def __run_test(self, has_hotstart: bool, is_hotstart: bool) -> bool:
+    def __run_test(self, has_hotstart: bool, is_hotstart: bool) -> dict:
         """
         Run the test
 
@@ -222,7 +227,7 @@ class AdcircTest:
             is_hotstart: if the test is a hotstart
 
         Returns:
-            True if the test passed, False otherwise
+            A dictionary with the status of the test
         """
         import os
         import subprocess
@@ -259,7 +264,13 @@ class AdcircTest:
                 else:
                     total_cpu = self.__test_yaml["ncpu"]
 
-                cmd = ["mpirun", "--allow-run-as-root", "-np", "{:d}".format(total_cpu), self.__executable]
+                cmd = [
+                    "mpirun",
+                    "--allow-run-as-root",
+                    "-np",
+                    "{:d}".format(total_cpu),
+                    self.__executable,
+                ]
                 if "n_writer" in self.__test_yaml and self.__test_yaml["n_writer"] > 0:
                     cmd += ["-W", "{:d}".format(self.__test_yaml["n_writer"])]
             else:
@@ -307,10 +318,10 @@ class AdcircTest:
             # Change back to the original directory
             os.chdir(cwd)
 
-        passed, _ = self.check_results(has_hotstart, is_hotstart)
-        return passed
+        passed, failed_files = self.check_results(has_hotstart, is_hotstart)
+        return {"complete": True, "passed": passed, "failed_files": failed_files}
 
-    def __prep_simulation(self):
+    def __prep_simulation(self) -> None:
         """
         Run the prep executable
 
@@ -419,9 +430,8 @@ class AdcircTest:
 
         return all_passed, error_files
 
-    def __compare_files(
-        self, control_file: str, test_file: str, tolerance: float
-    ) -> bool:
+    @staticmethod
+    def __compare_files(control_file: str, test_file: str, tolerance: float) -> bool:
         """
         Compare the control and test files
 
@@ -496,22 +506,30 @@ class AdcircTest:
             if control[var].dtype.kind not in "fi":
                 continue
 
+            if "time_of" in var:
+                # 60 seconds. This is because the time-of comparison
+                # is different from the other variables which are
+                # solution parameters
+                this_tolerance = 60
+            else:
+                this_tolerance = tolerance
+
             # Check that the variables are the same and get the maximum difference
             try:
                 npt.assert_allclose(
-                    control[var], test[var], atol=tolerance, equal_nan=True
+                    control[var], test[var], atol=this_tolerance, equal_nan=True
                 )
             except AssertionError:
                 max_difference = np.nanmax(
-                    np.abs(control[var].values - test[var].values)
+                    np.abs(control[var].to_numpy() - test[var].to_numpy())
                 )
                 if var != "v":
                     logging.error(
-                        f"Error in variable: {var} with tolerance {tolerance} and maximum difference: {max_difference}"
+                        f"Error in variable: {var} with tolerance {this_tolerance} and maximum difference: {max_difference}"
                     )
                 else:
                     logging.error(
-                        f"Error with tolerance {tolerance} and maximum difference: {max_difference}"
+                        f"Error with tolerance {this_tolerance} and maximum difference: {max_difference}"
                     )
                 passed = False
         return passed
@@ -699,9 +717,12 @@ class AdcircTest:
         )
         return dataset, time, iteration
 
-    def plot(self) -> None:
+    def plot(self, status: dict) -> None:
         """
         Plot the results of the test
+
+        Args:
+            status: Dictionary with the status of the tests (coldstart, hotstart)
 
         Returns:
             None
@@ -709,14 +730,17 @@ class AdcircTest:
         if "hotstart" in self.__test_yaml and self.__test_yaml["hotstart"]:
             coldstart_directory = self.__get_test_directory(True, False)
             hotstart_directory = self.__get_test_directory(True, True)
-            logger.info("Plotting cold-start results")
-            self.__plot_simulation(coldstart_directory)
-            logger.info("Plotting hot-start results")
-            self.__plot_simulation(hotstart_directory)
+            if status["coldstart"]["complete"]:
+                logger.info("Plotting cold-start results")
+                self.__plot_simulation(coldstart_directory)
+            if status["coldstart"]["passed"] and status["hotstart"]["complete"]:
+                logger.info("Plotting hot-start results")
+                self.__plot_simulation(hotstart_directory)
         else:
-            logger.info("Plotting test results")
-            test_directory = self.__get_test_directory(False, False)
-            self.__plot_simulation(test_directory)
+            if status["coldstart"]["complete"]:
+                logger.info("Plotting test results")
+                test_directory = self.__get_test_directory(False, False)
+                self.__plot_simulation(test_directory)
 
     def __plot_simulation(self, test_directory: str) -> None:
         """
@@ -779,7 +803,7 @@ class AdcircTest:
         control_data, test_data, var = AdcircTest.__get_test_data(
             mesh_file, control_file, test_file
         )
-        max_diff = np.abs(test_data[var].values - control_data[var].values)[0, :, 0]
+        max_diff = np.abs(test_data[var].to_numpy() - control_data[var].to_numpy())[0, :, 0]
 
         # ... Make a histogram plot of the test results
         fig, ax = plt.subplots()
@@ -804,12 +828,12 @@ class AdcircTest:
         y = control_data["y"].to_numpy()
 
         # Contour the data with symmetrical limits around the max difference
-        diff = control_data[var].values[0, :, 0] - test_data[var].values[0, :, 0]
+        diff = control_data[var].to_numpy()[0, :, 0] - test_data[var].to_numpy()[0, :, 0]
 
         # Compute the value of the 95th percentile difference
         max_diff = np.nanmax(np.abs(diff))
-        max_val = np.nanmax(test_data[var].values[0, :, 0])
-        min_val = np.nanmin(test_data[var].values[0, :, 0])
+        max_val = np.nanmax(test_data[var].to_numpy()[0, :, 0])
+        min_val = np.nanmin(test_data[var].to_numpy()[0, :, 0])
 
         if max_val == min_val:
             min_val -= 0.1
@@ -817,8 +841,8 @@ class AdcircTest:
             max_95 = max_val
             min_5 = min_val
         else:
-            valid_points = np.where(~np.isnan(test_data[var].values[0, :, 0]))
-            valid_data = test_data[var].values[0, :, 0][valid_points]
+            valid_points = np.where(~np.isnan(test_data[var].to_numpy()[0, :, 0]))
+            valid_data = test_data[var].to_numpy()[0, :, 0][valid_points]
             max_95 = np.nanpercentile(valid_data, 95)
             min_5 = np.nanpercentile(valid_data, 5)
             if max_95 == min_5:
@@ -894,8 +918,8 @@ class AdcircTest:
         ax.set_aspect("equal")
         tri = Triangulation(x, y, control_data["element"] - 1)
         percentile_95 = np.nanpercentile(np.abs(diff), 95)
-        min_5 = np.nanpercentile(test_data[var].values[0, :, 0], 5)
-        max_95 = np.nanpercentile(test_data[var].values[0, :, 0], 95)
+        min_5 = np.nanpercentile(test_data[var].to_numpy()[0, :, 0], 5)
+        max_95 = np.nanpercentile(test_data[var].to_numpy()[0, :, 0], 95)
 
         if percentile_95 == 0.0:
             percentile_95 = 0.1
@@ -933,10 +957,12 @@ class AdcircTest:
         # Plot the test data
         fig, ax = plt.subplots()
         ax.set_aspect("equal")
-        tri_masked = AdcircTest.get_masked_triangulation(tri, test_data[var].values[0, :, 0])
+        tri_masked = AdcircTest.get_masked_triangulation(
+            tri, test_data[var].to_numpy()[0, :, 0]
+        )
         contour = ax.tricontourf(
             tri_masked,
-            test_data[var].values[0, :, 0],
+            test_data[var].to_numpy()[0, :, 0],
             cmap="viridis",
             levels=contour_levels,
             alpha=alpha,
@@ -1000,7 +1026,7 @@ class AdcircTest:
         x_sg, y_sg = transformer_toster.transform(x_g, y_g)
         tri = Triangulation(x_s, y_s, control_data["element"] - 1)
         diff_zi = LinearTriInterpolator(tri, diff)(x_sg, y_sg)
-        zi = LinearTriInterpolator(tri, test_data[var].values[0, :, 0])(x_sg, y_sg)
+        zi = LinearTriInterpolator(tri, test_data[var].to_numpy()[0, :, 0])(x_sg, y_sg)
         fig, ax = plt.subplots()
         fig.set_size_inches(12, 8)
 

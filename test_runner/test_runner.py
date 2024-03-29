@@ -61,9 +61,9 @@ def adcirc_testsuite_runner():
         )
 
         this_test.clean()
-        passed = this_test.run()
-        this_test.plot()
-        if not passed:
+        status = this_test.run()
+        this_test.plot(status)
+        if not status["overall"]["passed"]:
             any_failure = True
             msg = f"Test {test_name} failed"
             if not args.continue_on_failure:
