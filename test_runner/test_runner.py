@@ -30,9 +30,17 @@ def adcirc_testsuite_runner():
         "--test-root", type=str, help="Root directory for tests", required=True
     )
     parser.add_argument("--all", action="store_true", help="Run all tests")
-    parser.add_argument("--continue-on-failure", action="store_true", help="Continue on failure")
+    parser.add_argument(
+        "--continue-on-failure", action="store_true", help="Continue on failure"
+    )
+    parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
 
     args = parser.parse_args()
+
+    if args.verbose:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
 
     if not args.all and not args.test:
         msg = "Either --all or --test must be specified"
@@ -54,10 +62,16 @@ def adcirc_testsuite_runner():
         test_list.append(args.test)
 
     any_failure = False
-    for test_name in test_list:
+    for i, test_name in enumerate(test_list):
+
+        if len(test_list) > 1:
+            logger.info(f"Running test {i+1} of {len(test_list)}: {test_name}")
+        else:
+            logger.info(f"Running test: {test_name}")
+
         test_data = all_test_info["tests"][test_name]
         this_test = AdcircTest(
-            test_name, test_data, args.bin, args.test_root, args.tolerance
+            test_name, test_data, args.bin, args.test_root, args.tolerance, args.verbose
         )
 
         this_test.clean()

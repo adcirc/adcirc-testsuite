@@ -34,6 +34,7 @@ class AdcircTest:
         binary_directory: str,
         root_dir: str,
         tolerance: float,
+        verbose: bool = False,
     ):
         """
         Initialize the AdcircTest object
@@ -44,7 +45,14 @@ class AdcircTest:
             binary_directory: Path to the ADCIRC binary directory
             root_dir: Root directory for the tests
             tolerance: Tolerance for the test results
+            verbose: Verbose output
         """
+
+        if verbose:
+            logger.setLevel(logging.DEBUG)
+        else:
+            logger.setLevel(logging.INFO)
+
         self.__bin = binary_directory
         self.__tolerance = tolerance
         self.__test = test
@@ -80,12 +88,14 @@ class AdcircTest:
         model_executable = None
 
         if self.__test_yaml["model"] == "adcirc":
+            logger.debug("Searching for ADCIRC executables")
             if self.__test_yaml["parallel"]:
                 model_executable = os.path.join(self.__bin, "padcirc")
                 prep_executable = os.path.join(self.__bin, "adcprep")
             else:
                 model_executable = os.path.join(self.__bin, "adcirc")
         elif self.__test_yaml["model"] == "adcirc+swan":
+            logger.debug("Searching for ADCIRC+SWAN executables")
             if self.__test_yaml["parallel"]:
                 model_executable = os.path.join(self.__bin, "padcswan")
                 prep_executable = os.path.join(self.__bin, "adcprep")
@@ -133,7 +143,7 @@ class AdcircTest:
         Returns:
             None
         """
-        logger.info("Cleaning test directory")
+        logger.info(f"Cleaning test directory: {self.__test_directory}")
         if "hotstart" in self.__test_yaml and self.__test_yaml["hotstart"]:
             coldstart_directory = self.__get_test_directory(True, False)
             hotstart_directory = self.__get_test_directory(True, True)
@@ -155,12 +165,14 @@ class AdcircTest:
         if "rm_files" in self.__test_yaml:
             for file in self.__test_yaml["rm_files"]:
                 file_path = os.path.join(test_directory, file)
+                logger.debug(f"Checking for file: {file_path}")
                 if os.path.exists(file_path):
                     os.remove(file_path)
                     logger.info(f"Removed file: {file_path}")
 
         for file in self.__test_yaml["output_files"]:
             file_path = os.path.join(test_directory, file)
+            logger.debug(f"Checking for file: {file_path}")
             if os.path.exists(file_path):
                 os.remove(file_path)
                 logger.info(f"Removed file: {file_path}")
@@ -256,8 +268,6 @@ class AdcircTest:
                 file=open(os.devnull, "w"),  # noqa: SIM115
             )
 
-            logger.info(f"Running test: {self.__test}")
-
             if self.__test_yaml["parallel"]:
                 if "n_writer" in self.__test_yaml:
                     total_cpu = self.__test_yaml["ncpu"] + self.__test_yaml["n_writer"]
@@ -276,6 +286,8 @@ class AdcircTest:
             else:
                 cmd = self.__executable
 
+            cmd_string = " ".join(cmd)
+            logger.debug(f"Running command: {cmd_string}")
             process = subprocess.Popen(
                 cmd,
                 shell=False,
@@ -352,6 +364,10 @@ class AdcircTest:
             "{:d}".format(self.__test_yaml["ncpu"]),
             "--prepall",
         ]
+
+        cmd_string = " ".join(cmd)
+        logger.debug(f"Running command: {cmd_string}")
+
         ret = subprocess.run(
             cmd,
             shell=False,
@@ -362,7 +378,7 @@ class AdcircTest:
             msg = f"Prep executable failed with return code: {ret.returncode}"
             raise RuntimeError(msg)
 
-    def __get_test_directory(self, has_hotstart: bool, is_hotstart: bool):
+    def __get_test_directory(self, has_hotstart: bool, is_hotstart: bool) -> str:
         """
         Gets the test directory based on the hotstart information
 
@@ -403,7 +419,7 @@ class AdcircTest:
 
         for file in self.__test_yaml["output_files"]:
 
-            logging.info(f"Checking file: {file}")
+            logger.info(f"Checking file: {file}")
 
             control_file = os.path.join(test_directory, "control", file)
             test_file = os.path.join(test_directory, file)
@@ -482,7 +498,9 @@ class AdcircTest:
         return passed_test
 
     @staticmethod
-    def __compare_datasets(control: xr.Dataset, test: xr.Dataset, tolerance) -> bool:
+    def __compare_datasets(
+        control: xr.Dataset, test: xr.Dataset, tolerance: float
+    ) -> bool:
         """
         Compare the control and test datasets using xarray and numpy
 
@@ -521,11 +539,11 @@ class AdcircTest:
                     np.abs(control[var].to_numpy() - test[var].to_numpy())
                 )
                 if var != "v":
-                    logging.error(
+                    logger.error(
                         f"Error in variable: {var} with tolerance {this_tolerance} and maximum difference: {max_difference}"
                     )
                 else:
-                    logging.error(
+                    logger.error(
                         f"Error with tolerance {this_tolerance} and maximum difference: {max_difference}"
                     )
                 passed = False
@@ -685,7 +703,7 @@ class AdcircTest:
 
     @staticmethod
     def __read_adcirc_output_snap_full(
-        file_obj, header
+        file_obj, header: dict
     ) -> Tuple[xr.Dataset, float, int]:
         """
         Read an ADCIRC output snap file with full data
@@ -797,6 +815,8 @@ class AdcircTest:
         import os
         import matplotlib.pyplot as plt
 
+        logger.info(f"Plotting peak values for file: {test_file}")
+
         control_data, test_data, var = AdcircTest.__get_test_data(
             mesh_file, control_file, test_file
         )
@@ -898,19 +918,39 @@ class AdcircTest:
 
     @staticmethod
     def __plot_data_cartesian(
-        test_name,
-        var,
-        x,
-        y,
-        test_data,
-        control_data,
-        diff,
-        contour_levels,
-        contour_ticks,
-        diff_contour_levels,
-        diff_ticks,
-        output_directory,
+        test_name: str,
+        var: str,
+        x: np.ndarray,
+        y: np.ndarray,
+        test_data: xr.Dataset,
+        control_data: xr.Dataset,
+        diff: np.ndarray,
+        contour_levels: np.ndarray,
+        contour_ticks: np.ndarray,
+        diff_contour_levels: np.ndarray,
+        diff_ticks: np.ndarray,
+        output_directory: str,
     ):
+        """
+        Plot the data in cartesian coordinates
+
+        Args:
+            test_name: Name of the test
+            var: Variable to plot
+            x: X coordinates
+            y: Y coordinates
+            test_data: Test data
+            control_data: Control data
+            diff: Difference between test and control data
+            contour_levels: Contour levels for the test data
+            contour_ticks: Contour ticks for the test data
+            diff_contour_levels: Contour levels for the difference
+            diff_ticks: Contour ticks for the difference
+            output_directory: Output directory for the plots
+
+        Returns:
+            None
+        """
         import os
         import matplotlib.pyplot as plt
 
@@ -985,20 +1025,41 @@ class AdcircTest:
 
     @staticmethod
     def __plot_maps_geographic(
-        test_name,
-        x,
-        y,
-        test_data,
-        control_data,
-        diff,
-        var,
-        contour_levels,
-        contour_ticks,
-        diff_contour_levels,
-        diff_ticks,
-        output_directory,
-        is_global,
+        test_name: str,
+        x: np.ndarray,
+        y: np.ndarray,
+        test_data: xr.Dataset,
+        control_data: xr.Dataset,
+        diff: np.ndarray,
+        var: str,
+        contour_levels: np.ndarray,
+        contour_ticks: np.ndarray,
+        diff_contour_levels: np.ndarray,
+        diff_ticks: np.ndarray,
+        output_directory: str,
+        is_global: bool,
     ):
+        """
+        Plot the data on a map
+
+        Args:
+            test_name: Name of the test
+            x: X coordinates
+            y: Y coordinates
+            test_data: Test data
+            control_data: Control data
+            diff: Difference between test and control data
+            var: Variable to plot
+            contour_levels: Contour levels for the test data
+            contour_ticks: Contour ticks for the test data
+            diff_contour_levels: Contour levels for the difference
+            diff_ticks: Contour ticks for the difference
+            output_directory: Output directory for the plots
+            is_global: If the mesh is global
+
+        Returns:
+            None
+        """
         import os
         import pyproj
         import matplotlib.pyplot as plt
@@ -1073,8 +1134,8 @@ class AdcircTest:
         ax.set_title(f"Max Difference for {var}")
         plt.savefig(os.path.join(output_directory, f"max_diff_{var}_contour.png"))
         plt.close(fig)
-        fig, ax = plt.subplots()
 
+        fig, ax = plt.subplots()
         if is_global:
             m = Basemap(
                 projection="robin",
@@ -1111,6 +1172,7 @@ class AdcircTest:
             dpi=300,
             bbox_inches="tight",
         )
+        plt.close(fig)
 
     @staticmethod
     def plot_station_files(
@@ -1130,6 +1192,8 @@ class AdcircTest:
         """
         import os
         import matplotlib.pyplot as plt
+
+        logger.info(f"Plotting station data for file: {test_file}")
 
         control_data, test_data, var = AdcircTest.__get_test_data(
             None,
@@ -1197,13 +1261,13 @@ class AdcircTest:
         """
         var = AdcircTest.__get_adcirc_variable(test_file)
         if test_file.endswith(".nc"):
-            test_data = AdcircTest.__get_netcdf_data(test_file, var, timeseries)
+            test_data = AdcircTest.__get_netcdf_data(test_file, var)
         else:
             test_data = AdcircTest.__get_ascii_data(
                 mesh_file, test_file, var, timeseries
             )
         if control_file.endswith(".nc"):
-            control_data = AdcircTest.__get_netcdf_data(control_file, var, timeseries)
+            control_data = AdcircTest.__get_netcdf_data(control_file, var)
         else:
             control_data = AdcircTest.__get_ascii_data(
                 mesh_file, control_file, var, timeseries
@@ -1211,7 +1275,7 @@ class AdcircTest:
         return control_data, test_data, var
 
     @staticmethod
-    def __get_adcirc_variable(test_file):
+    def __get_adcirc_variable(test_file: str) -> str:
         """
         Get the ADCIRC variable based on the test file
 
@@ -1243,7 +1307,17 @@ class AdcircTest:
         return var
 
     @staticmethod
-    def __get_netcdf_data(file: str, variable: str, timeseries: bool) -> xr.Dataset:
+    def __get_netcdf_data(file: str, variable: str) -> xr.Dataset:
+        """
+        Get the data from a netcdf ADCIRC output file
+
+        Args:
+            file: Name of the file
+            variable: Variable to extract
+
+        Returns:
+            xarray dataset
+        """
         temp_dataset = xr.open_dataset(
             file,
             drop_variables=AdcircTest.ADCIRC_DROP_VARIABLES_LIST,
@@ -1354,7 +1428,7 @@ class AdcircTest:
                         node = int(line[0])
                         for j in range(header["n_values"]):
                             val = float(line[j + 1])
-                            if val < -999.0:
+                            if val <= fill_value:
                                 val = np.nan
                             data[t, node, j] = val
             else:
@@ -1383,58 +1457,6 @@ class AdcircTest:
         dataset["time"] = xr.DataArray(time_data, dims=["time"])
 
         return dataset
-
-    @staticmethod
-    def shift_duplicate_nodes(
-        x: np.array, y: np.array, elements: np.array
-    ) -> Tuple[np.array, np.array]:
-        """
-        Shift the duplicate points
-
-        Args:
-            x: x coordinates
-            y: y coordinates
-            elements: Elements
-        """
-        import numpy as np
-        from scipy.spatial import cKDTree
-
-        # Get the unique nodes
-        is_duplicate = np.full(x.size, False)
-
-        # Flag the duplicate nodes by checking if another
-        # point exists with duplicate coordinates
-        tree = cKDTree(np.column_stack((x, y)))
-        for i in range(x.size):
-            dst, idx = tree.query((x[i], y[i]), k=2)
-            if dst[1] < 1e-6:
-                is_duplicate[i] = True
-
-        # Print the count of duplicate nodes
-        n_duplicates = np.sum(is_duplicate)
-
-        if n_duplicates > 0:
-            logging.info(f"Number of duplicate nodes: {n_duplicates}")
-        else:
-            return x, y
-
-        # If the node is duplicated, shift it slightly toward the center
-        # of the nearest element center
-        element_centers = np.zeros((elements.shape[0], 2))
-        for i in range(elements.shape[0]):
-            element_centers[i, 0] = np.mean(x[elements[i, :]])
-            element_centers[i, 1] = np.mean(y[elements[i, :]])
-
-        center_tree = cKDTree(element_centers)
-        for i in range(x.size):
-            if is_duplicate[i]:
-                dst, idx = center_tree.query((x[i], y[i]))
-                shift_x = 0.1 * (element_centers[idx, 0] - x[i])
-                shift_y = 0.1 * (element_centers[idx, 1] - y[i])
-                x[i] += shift_x
-                y[i] += shift_y
-
-        return x, y
 
     @staticmethod
     def get_masked_triangulation(t: Triangulation, data: np.array) -> Triangulation:
