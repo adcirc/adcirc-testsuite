@@ -24,35 +24,55 @@ def adcirc_testsuite_runner():
     parser.add_argument(
         "--tolerance", type=float, help="Tolerance for the test results", required=True
     )
-    parser.add_argument("--test", type=str, help="Test name", required=True)
+    parser.add_argument("--test", type=str, help="Test name", required=False)
     parser.add_argument("--test-yaml", type=str, help="Test yaml file", required=True)
     parser.add_argument(
         "--test-root", type=str, help="Root directory for tests", required=True
     )
+    parser.add_argument("--all", action="store_true", help="Run all tests")
+    parser.add_argument("--continue-on-failure", action="store_true", help="Continue on failure")
 
     args = parser.parse_args()
+
+    if not args.all and not args.test:
+        msg = "Either --all or --test must be specified"
+        raise ValueError(msg)
 
     if not os.path.exists(args.bin):
         msg = f"ADCIRC binary directory {args.bin} does not exist"
         raise FileNotFoundError(msg)
 
     all_test_info = yaml.safe_load(open(args.test_yaml))
-    test_name = args.test
-    if test_name not in all_test_info["tests"]:
-        msg = f"Test {test_name} not found in {args.test_yaml}"
-        raise ValueError(msg)
 
-    test_data = all_test_info["tests"][test_name]
-    this_test = AdcircTest(
-        test_name, test_data, args.bin, args.test_root, args.tolerance
-    )
+    test_list = []
+    if args.all:
+        test_list = all_test_info["tests"]
+    else:
+        if args.test not in all_test_info["tests"]:
+            msg = f"Test {args.test} not found in {args.test_yaml}"
+            raise ValueError(msg)
+        test_list.append(args.test)
 
-    this_test.clean()
-    passed = this_test.run()
-    this_test.plot()
-    if not passed:
-        msg = f"Test {test_name} failed"
-        raise ValueError(msg)
+    any_failure = False
+    for test_name in test_list:
+        test_data = all_test_info["tests"][test_name]
+        this_test = AdcircTest(
+            test_name, test_data, args.bin, args.test_root, args.tolerance
+        )
+
+        this_test.clean()
+        passed = this_test.run()
+        this_test.plot()
+        if not passed:
+            any_failure = True
+            msg = f"Test {test_name} failed"
+            if not args.continue_on_failure:
+                raise ValueError(msg)
+            else:
+                logger.error(msg)
+
+    if any_failure:
+        raise ValueError("One or more tests failed")
 
 
 if __name__ == "__main__":
