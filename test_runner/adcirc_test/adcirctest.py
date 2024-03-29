@@ -259,7 +259,7 @@ class AdcircTest:
                 else:
                     total_cpu = self.__test_yaml["ncpu"]
 
-                cmd = ["mpirun", "-np", "{:d}".format(total_cpu), self.__executable]
+                cmd = ["mpirun", "--allow-run-as-root", "-np", "{:d}".format(total_cpu), self.__executable]
                 if "n_writer" in self.__test_yaml and self.__test_yaml["n_writer"] > 0:
                     cmd += ["-W", "{:d}".format(self.__test_yaml["n_writer"])]
             else:
