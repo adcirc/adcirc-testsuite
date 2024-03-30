@@ -304,7 +304,12 @@ class AdcircTest:
                     log.write(line)
                     if "TIME STEP" in line and "ITERATIONS" in line:
                         line = line.strip().split()
-                        percent_new = int(float(line[4].split("%")[0]))
+
+                        try: 
+                            percent_new = int(float(line[4].split("%")[0]))
+                        except ValueError:
+                            percent_new = percent
+
                         if (
                             percent_new % 5 == 0 or percent_new - percent > 10
                         ) and percent_new > percent:

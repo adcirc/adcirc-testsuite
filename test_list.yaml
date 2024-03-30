@@ -191,7 +191,7 @@ tests:
     model: adcirc
     parallel: false
     hotstart: false
-    geographic: true
+    geographic: false
     global: false
     output_files:
       - fort.63
@@ -204,7 +204,7 @@ tests:
     parallel: true
     ncpu: 4
     hotstart: false
-    geographic: true
+    geographic: false
     global: false
     output_files:
       - fort.63
