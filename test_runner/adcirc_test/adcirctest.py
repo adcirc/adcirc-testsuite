@@ -222,13 +222,14 @@ class AdcircTest:
         )
         for file in hotstart_file_options:
             file_cold = os.path.join(test_directory_cold, file)
+            file_binary_cold = os.path.join(test_directory_cold, "PE0000", file)
             file_hot = os.path.join(test_directory_hot, file)
             if os.path.exists(file_cold):
                 shutil.copy(file_cold, file_hot)
                 logger.info(f"Copied hotstart file: {file_cold} to {file_hot}")
-            elif os.path.exists(os.path.join("PE0000", file_cold)):
-                shutil.copy(os.path.join("PE0000", file_cold), file_hot)
-                logger.info(f"Copied hotstart file: {file_cold} to {file_hot}")
+            elif os.path.exists(file_binary_cold):
+                shutil.copy(file_binary_cold, file_hot)
+                logger.info(f"Copied hotstart file: {file_binary_cold} to {file_hot}")
 
     def __run_test(self, has_hotstart: bool, is_hotstart: bool) -> dict:
         """
