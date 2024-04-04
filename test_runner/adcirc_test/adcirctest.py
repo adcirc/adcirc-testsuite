@@ -299,6 +299,7 @@ class AdcircTest:
             )
 
             percent = 0
+            logger.info(progress_bar)
             with open(log_file, "w") as log:
                 for line in process.stdout:
                     log.write(line)
@@ -961,7 +962,6 @@ class AdcircTest:
         import matplotlib.pyplot as plt
 
         fig, ax = plt.subplots()
-        fig.set_size_inches(12, 8)
         ax.set_aspect("equal")
         tri = Triangulation(x, y, control_data["element"] - 1)
         percentile_95 = np.nanpercentile(np.abs(diff), 95)
@@ -1096,7 +1096,6 @@ class AdcircTest:
         diff_zi = LinearTriInterpolator(tri, diff)(x_sg, y_sg)
         zi = LinearTriInterpolator(tri, test_data[var].to_numpy()[0, :, 0])(x_sg, y_sg)
         fig, ax = plt.subplots()
-        fig.set_size_inches(12, 8)
 
         if x_max - x_min > 100:
             res = "i"

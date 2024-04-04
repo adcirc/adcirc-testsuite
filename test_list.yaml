@@ -572,3 +572,22 @@ tests:
       - minpr.63
       - swan_HS_max.63
       - swan_TPS_max.63
+  adcirc_swan_apes_irene-parallel:
+    path: adcirc-swan/adcirc_swan_apes_irene-parallel
+    model: adcirc+swan
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - maxwvel.63.nc
+      - minpr.63.nc
+      - swan_HS_max.63.nc
+      - swan_TPS_max.63.nc
