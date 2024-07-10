@@ -80,6 +80,17 @@ tests:
     output_files:
       - fort.63.nc
       - maxele.63.nc
+  adcirc_baroclinic_internaltide_2d:
+    path: adcirc/adcirc_baroclinic_internaltide_2d
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    geographic: true
+    global: true
+    output_files:
+      - fort.63.nc
+      - maxele.63.nc
   adcirc_global-alidisp+buoyancy-2d-parallel:
     path: adcirc/adcirc_global-alidisp+buoyancy-2d-parallel
     model: adcirc
