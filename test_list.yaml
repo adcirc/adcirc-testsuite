@@ -155,6 +155,56 @@ tests:
       - fort.64.nc
       - maxele.63.nc
       - maxvel.63.nc
+  adcirc_global-tide-2d-full-tip-analytical-serial:
+    path: adcirc/adcirc_global-tide-2d-full-tip-analytical-serial
+    model: adcirc
+    parallel: false
+    hotstart: false
+    geographic: true
+    global: true
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+  adcirc_global-tide-2d-full-tip-analytical-parallel:
+    path: adcirc/adcirc_global-tide-2d-full-tip-analytical-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    geographic: true
+    global: true
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+  adcirc_global-tide-2d-full-tip-JPL-emphemerides-serial:
+    path: adcirc/adcirc_global-tide-2d-full-tip-JPL-emphemerides-serial
+    model: adcirc
+    parallel: false
+    hotstart: false
+    geographic: true
+    global: true
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+  adcirc_global-tide-2d-full-tip-JPL-emphemerides-parallel:
+    path: adcirc/adcirc_global-tide-2d-full-tip-JPL-emphemerides-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    geographic: true
+    global: true
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
   adcirc_global_nws10-2d:
     path: adcirc/adcirc_global_nws10-2d
     model: adcirc
