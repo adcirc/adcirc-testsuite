@@ -610,6 +610,7 @@ tests:
     geographic: true
     global: false
     output_files:
+      - fort.61
       - fort.63.nc
       - fort.64.nc
       - fort.77

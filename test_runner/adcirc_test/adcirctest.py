@@ -878,16 +878,19 @@ class AdcircTest:
                 max_95 += 0.1
 
         if max_diff == 0:
-            percentile_95 = 0.1
+            min_percentile_95 = -0.1
+            max_percentile_95 = 0.1
         else:
             valid_points = np.where(~np.isnan(diff))
             valid_diff = diff[valid_points]
             percentile_95 = np.nanpercentile(valid_diff, 95)
             if percentile_95 == 0.0:
                 percentile_95 = 0.1
+            min_percentile_95 = min(percentile_95,-percentile_95)
+            max_percentile_95 = max(percentile_95,-percentile_95)
 
-        diff_contour_levels = np.linspace(-percentile_95, percentile_95, 100)
-        diff_ticks = np.linspace(-percentile_95, percentile_95, 11)
+        diff_contour_levels = np.linspace(min_percentile_95, max_percentile_95, 100)
+        diff_ticks = np.linspace(min_percentile_95, max_percentile_95, 11)
         contour_levels = np.linspace(min_5, max_95, 100)
         contour_ticks = np.linspace(min_5, max_95, 11)
 
