@@ -18,6 +18,23 @@ tests:
       - fort.221.inv
       - fort.222.inv
       - fort.225.inv
+  adcirc_global-nws14-inset-parallel:
+    path: adcirc/adcirc_global-nws14-inset-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    geographic: true
+    global: true
+    output_files:
+      - fort.63.nc
+      - fort.64.nc 
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - maxwvel.63.nc
+      - minpr.63.nc
   adcirc_apes:
     path: adcirc/adcirc_apes
     model: adcirc
