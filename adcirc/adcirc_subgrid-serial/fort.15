@@ -1035,4 +1035,5 @@ invertedBarometerOnElevationBoundary = F,
 subgridFilename="avgVars.nc",
 level0 = .true.,
 level1 = .true.,
+phi_time_derivative = .true.,
 /
