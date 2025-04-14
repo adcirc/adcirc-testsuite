@@ -633,6 +633,154 @@ tests:
       - fort.77
       - maxele.63.nc
       - maxvel.63.nc
+  adcirc_irene_cle15:
+    path: adcirc/adcirc_irene_cle15
+    model: adcirc
+    parallel: false
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - minpr.63.nc
+      - maxwvel.63.nc
+  adcirc_irene_cle15-parallel:
+    path: adcirc/adcirc_irene_cle15-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - minpr.63.nc
+      - maxwvel.63.nc
+  adcirc_irene_cle15_lc12:
+    path: adcirc/adcirc_irene_cle15_lc12
+    model: adcirc
+    parallel: false
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - minpr.63.nc
+      - maxwvel.63.nc
+  adcirc_irene_cle15_lc12-parallel:
+    path: adcirc/adcirc_irene_cle15_lc12-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - minpr.63.nc
+      - maxwvel.63.nc
+  adcirc_irene_holland_lc12:
+    path: adcirc/adcirc_irene_holland_lc12
+    model: adcirc
+    parallel: false
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - minpr.63.nc
+      - maxwvel.63.nc
+  adcirc_irene_holland_legacy:
+    path: adcirc/adcirc_irene_holland_legacy
+    model: adcirc
+    parallel: false
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - minpr.63.nc
+      - maxwvel.63.nc
+  adcirc_irene_holland_legacy-parallel:
+    path: adcirc/adcirc_irene_holland_legacy-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - minpr.63.nc
+      - maxwvel.63.nc
+  adcirc_irene_holland_new:
+    path: adcirc/adcirc_irene_holland_new
+    model: adcirc
+    parallel: false
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - minpr.63.nc
+      - maxwvel.63.nc
+  adcirc_irene_holland_new-parallel:
+    path: adcirc/adcirc_irene_holland_new-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - fort.73.nc
+      - fort.74.nc
+      - maxele.63.nc
+      - maxvel.63.nc
+      - minpr.63.nc
+      - maxwvel.63.nc
   adcirc_swan_apes_irene:
     path: adcirc-swan/adcirc_swan_apes_irene
     model: adcirc+swan
