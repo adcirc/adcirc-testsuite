@@ -60,8 +60,8 @@ Host: Name
 Metric, Datum
 name@instit.edu
 2011-08-21 00:00:00 UTC
-! -- Begin nws8 Control Namelist -- 
-&nws8Control
+! -- Begin nws08Control Namelist -- 
+&nws08Control
 vortexModel = 'CLE15',
 backgroundWindModel = 'LC12',
 BCalc = 'exact',
@@ -71,4 +71,4 @@ w_cool = 2.0,
 CkCd_calc = .false.,
 CkCd = 1.0,
 /
-! -- End nws8 Control Namelist -- 
+! -- End nws08Control Namelist -- 
