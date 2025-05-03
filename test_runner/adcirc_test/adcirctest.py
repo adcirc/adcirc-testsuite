@@ -1,6 +1,8 @@
 import logging
 from typing import Tuple, Union, ClassVar
 
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
 import numpy as np
 import xarray as xr
 from matplotlib.tri import Triangulation
@@ -1070,111 +1072,90 @@ class AdcircTest:
             None
         """
         import os
-        import pyproj
         import matplotlib.pyplot as plt
-        from matplotlib.tri import Triangulation, LinearTriInterpolator
-        from mpl_toolkits.basemap import Basemap
+        from matplotlib.tri import Triangulation
 
         x_min = np.nanmin(test_data["x"].to_numpy())
         x_max = np.nanmax(test_data["x"].to_numpy())
         y_min = np.nanmin(test_data["y"].to_numpy())
         y_max = np.nanmax(test_data["y"].to_numpy())
-        parallels = np.linspace(y_min, y_max, 5)
-        meridians = np.linspace(x_min, x_max, 5)
-        parallels = np.round(parallels, 1)
-        meridians = np.round(meridians, 1)
-        crs_wgs = pyproj.CRS("EPSG:4326")
-        crs_stereo = pyproj.CRS("EPSG:32661")
-        transformer_toster = pyproj.Transformer.from_crs(
-            crs_wgs, crs_stereo, always_xy=True
-        )
-        x_s, y_s = transformer_toster.transform(x, y)
-        # Interpolate the data onto a regular grid
-        x_g, y_g = np.meshgrid(
-            np.linspace(np.min(x), np.max(x), 500),
-            np.linspace(np.min(y), np.max(y), 500),
-        )
-        x_sg, y_sg = transformer_toster.transform(x_g, y_g)
-        tri = Triangulation(x_s, y_s, control_data["element"] - 1)
-        diff_zi = LinearTriInterpolator(tri, diff)(x_sg, y_sg)
-        zi = LinearTriInterpolator(tri, test_data[var].to_numpy()[0, :, 0])(x_sg, y_sg)
-        fig, ax = plt.subplots()
-
-        if x_max - x_min > 100:
-            res = "i"
-        elif x_max - x_min > 30:
-            res = "h"
-        else:
-            res = "f"
 
         if is_global:
-            m = Basemap(
-                projection="robin",
-                lon_0=(x_min + x_max) / 2,
-                lat_0=(y_min + y_max) / 2,
-                llcrnrlon=x_min,
-                llcrnrlat=y_min,
-                urcrnrlon=x_max,
-                urcrnrlat=y_max,
-                resolution=res,
+            x_p, y_p = ccrs.Robinson().transform_points(
+                ccrs.PlateCarree(), x, y
+            )[:, :2].T
+            fig, ax = plt.subplots(figsize=(10, 8), subplot_kw={'projection': ccrs.Robinson()})
+            mask = ~np.all(
+                np.abs(
+                    np.diff(
+                        x[control_data["element"] - 1],
+                        axis=1,
+                    )
+                )
+                < 90,
+                axis=1,
             )
         else:
-            m = Basemap(
-                projection="merc",
-                lon_0=(x_min + x_max) / 2,
-                lat_0=(y_min + y_max) / 2,
-                llcrnrlon=x_min,
-                llcrnrlat=y_min,
-                urcrnrlon=x_max,
-                urcrnrlat=y_max,
-                resolution=res,
-            )
-        m.drawcoastlines()
-        m.drawcountries()
-        m.drawparallels(parallels, labels=[1, 0, 0, 0])
-        m.drawmeridians(meridians, labels=[0, 0, 0, 1])
-        x_m, y_m = m(x_g, y_g)
-        m.contourf(
-            x_m, y_m, diff_zi, levels=diff_contour_levels, cmap="bwr", extend="both"
+            x_p, y_p = ccrs.Mercator().transform_points(
+                ccrs.PlateCarree(), x, y
+            )[:, :2].T
+            fig, ax = plt.subplots(figsize=(10, 8), subplot_kw={'projection': ccrs.Mercator()})
+            mask = None
+
+        tri = Triangulation(x_p, y_p, control_data["element"] - 1,mask=mask)
+
+        ax.set_extent([x_min, x_max, y_min, y_max], crs=ccrs.PlateCarree())
+        contour = ax.tricontourf(
+            tri,
+            diff,
+            levels=diff_contour_levels,
+            cmap="bwr",
+            extend="both"
         )
-        cbar = m.colorbar(location="right", ticks=diff_ticks)
+        cbar = plt.colorbar(
+            contour, orientation="vertical", ax=ax, ticks=diff_ticks
+        )
+
         cbar.set_label("Difference")
-        ax.set_title(f"Max Difference for {var}")
-        plt.savefig(os.path.join(output_directory, f"max_diff_{var}_contour.png"))
-        plt.close(fig)
 
-        fig, ax = plt.subplots()
+        ax.add_feature(cfeature.BORDERS, linestyle=':')
+        ax.add_feature(cfeature.LAND, edgecolor='black')
+        ax.add_feature(cfeature.LAKES, edgecolor='black')
+        ax.add_feature(cfeature.COASTLINE, edgecolor='black')
+
+        ax.set_title(f"Max Difference for {var}")
+        plt.savefig(
+            os.path.join(output_directory, f"max_diff_{var}_contour.png"),
+            dpi=300,
+            bbox_inches="tight",
+        )
+
         if is_global:
-            m = Basemap(
-                projection="robin",
-                lon_0=(x_min + x_max) / 2,
-                lat_0=(y_min + y_max) / 2,
-                llcrnrlon=x_min,
-                llcrnrlat=y_min,
-                urcrnrlon=x_max,
-                urcrnrlat=y_max,
-                resolution=res,
-            )
+            fig, ax = plt.subplots(figsize=(10, 8), subplot_kw={'projection': ccrs.Robinson()})
         else:
-            m = Basemap(
-                projection="merc",
-                lon_0=(x_min + x_max) / 2,
-                lat_0=(y_min + y_max) / 2,
-                llcrnrlon=x_min,
-                llcrnrlat=y_min,
-                urcrnrlon=x_max,
-                urcrnrlat=y_max,
-                resolution=res,
-            )
-        m.drawcoastlines()
-        m.drawcountries()
-        m.drawparallels(parallels, labels=[1, 0, 0, 0])
-        m.drawmeridians(meridians, labels=[0, 0, 0, 1])
-        x_m, y_m = m(x_g, y_g)
-        m.contourf(x_m, y_m, zi, levels=contour_levels, cmap="viridis", extend="both")
-        cbar = m.colorbar(location="right", ticks=contour_ticks)
+            fig, ax = plt.subplots(figsize=(10, 8), subplot_kw={'projection': ccrs.Mercator()})
+            ax.set_extent([x_min, x_max, y_min, y_max], crs=ccrs.PlateCarree())
+
+        contour = ax.tricontourf(tri,
+                                 test_data[var].to_numpy()[0, :, 0],
+                                 levels=contour_levels,
+                                 cmap="viridis",
+                                 extend="both"
+        )
+        cbar = fig.colorbar(
+            contour,
+            orientation="vertical",
+            ax=ax,
+            ticks=contour_ticks
+        )
         cbar.set_label(var)
+
+        ax.add_feature(cfeature.BORDERS, linestyle=':')
+        ax.add_feature(cfeature.LAND, edgecolor='black')
+        ax.add_feature(cfeature.LAKES, edgecolor='black')
+        ax.add_feature(cfeature.COASTLINE, edgecolor='black')
         ax.set_title(f"Test: {test_name}, {var}")
+
         plt.savefig(
             os.path.join(output_directory, f"test_{var}_contour.png"),
             dpi=300,
@@ -1484,3 +1465,4 @@ class AdcircTest:
             if np.any(np.isin(t.triangles[i, :], masked_nodes)):
                 mask[i] = True
         return Triangulation(t.x, t.y, t.triangles, mask=mask)
+
