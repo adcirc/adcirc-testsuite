@@ -1105,8 +1105,9 @@ class AdcircTest:
         tri = Triangulation(x_p, y_p, control_data["element"] - 1,mask=mask)
 
         ax.set_extent([x_min, x_max, y_min, y_max], crs=ccrs.PlateCarree())
+        tri_masked = AdcircTest.get_masked_triangulation(tri, diff)
         contour = ax.tricontourf(
-            tri,
+            tri_masked,
             diff,
             levels=diff_contour_levels,
             cmap="bwr",
@@ -1136,7 +1137,8 @@ class AdcircTest:
             fig, ax = plt.subplots(figsize=(10, 8), subplot_kw={'projection': ccrs.Mercator()})
             ax.set_extent([x_min, x_max, y_min, y_max], crs=ccrs.PlateCarree())
 
-        contour = ax.tricontourf(tri,
+        tri_masked = AdcircTest.get_masked_triangulation(tri, test_data[var].to_numpy()[0, :, 0])
+        contour = ax.tricontourf(tri_masked,
                                  test_data[var].to_numpy()[0, :, 0],
                                  levels=contour_levels,
                                  cmap="viridis",
