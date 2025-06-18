@@ -549,6 +549,19 @@ tests:
       - fort.64.nc
       - maxele.63.nc
       - maxvel.63.nc
+  adcirc_rivers-rotated-parallel:
+    path: adcirc/adcirc_rivers-rotated-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: false
+    geographic: true
+    global: false
+    output_files:
+      - fort.63.nc
+      - fort.64.nc
+      - maxele.63.nc
+      - maxvel.63.nc
   adcirc_shinnecock_inlet:
     path: adcirc/adcirc_shinnecock_inlet
     model: adcirc
