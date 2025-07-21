@@ -831,3 +831,19 @@ tests:
       - minpr.63.nc
       - swan_HS_max.63.nc
       - swan_TPS_max.63.nc
+  adcirc_basin-3d-parallel:
+    path: adcirc/adcirc_basin-3d-parallel
+    model: adcirc
+    parallel: true
+    ncpu: 4 
+    geographic: true 
+    global: false 
+    output_files: 
+      - fort.44.nc 
+      - fort.45.nc 
+      - fort.48.nc 
+      - fort.63.nc 
+      - fort.64.nc 
+      - maxele.63.nc 
+      - maxvel.63.nc 
+
