@@ -1,0 +1,78 @@
+adcirc-3d-baroclinic-example
+Run_001
+1               ! NFOVER 
+0               ! NABOUT 
+100             ! NSCREEN 
+0               ! IHOT 
+1               ! ICS 
+711112          ! IM 
+4               ! IDEN
+1               ! NOLIBF 
+2               ! NOLIFA 
+1               ! NOLICA 
+1               ! NOLICAT 
+0               ! NWP 
+0               ! NCOR 
+0               ! NTIP 
+0               ! NWS 
+1               ! NRAMP 
+9.81            ! G  
+0.03            ! TAU0 
+1.0             ! DTDP 
+0               ! STATIM 
+0               ! REFTIM 
+0.25            ! RNDY 
+0.125           ! DRAMP 
+0.0 1.0 0.0     ! A00, B00, C00 
+0.1 0 0 0.01    ! H0, 2*dummy, VELMIN 
+0.0 0.0         ! SLAM0, SFEA0 
+0.0025          ! CF 
+10.0            ! ELSM 
+0.0             ! CORI 
+0               ! NTIF 
+0               ! NBFR 
+90.0            ! ANGINN 
+0 0.0 99.0 3600 ! NOUTE, TOUTSE, TOUTFE, NSPOOLE 
+0               ! NSTAE 
+0 0.0 99.0 3600 ! NOUTV, TOUTV, TOUTFV, NSPOOLV 
+0               ! NSTAV 
+5 0.0 99.0 3600 ! NOUTGE, ... 
+5 0.0 99.0 3600 ! NOUTGV, ... 
+0               ! NFREQ 
+30 120 360 0    ! THAS, THAF, NHAINC, FMV 
+0 0 0 0         ! NHASE, NHASV, NHAGE, NHAGV 
+0 0             ! NHSTAR, NHSINC 
+1 0 1.0e-10 25  ! ITITER, ISLDIA, CONVCR, ITMAX 
+4               ! IDEN, 0=barotropic model run
+2 0.005         ! slip code and slip coefficient
+0.01 0.01       ! free surface and bottom roughnesses (const. horiz)
+0.5 0.5 0.5     ! time stepping coefficients (alpha 1,2,3)
+1 11            ! f.e. grid code, # nodes in f.e. grid
+50 0.001 0.1    ! e.v. code, evmin, evcon coefficient
+0.5 0.5         ! THETA1, THETA2 included if IEVC = 50
+0 0.0 99.0 3600 ! DTS station output
+0
+0 0.0 99.0 3600 ! velocity station output
+0
+0 0.0 99.0 3600 ! turbulence station output
+0               ! coordinates of turbulence stations
+5 0.0 99.0 3600 ! DTS global output
+5 0.0 99.0 3600 ! velocity global output
+5 0.0 99.0 3600 ! turbulence global output
+4 0 0 0         ! Boundary condition flags for elevation, temperature RES_BC_FLAG, BCFLAG_LNM, BCFLAG_TEMP
+0.0             ! sponge dist
+2               ! eq state
+50.0 10.0       ! NLSD, NVSD
+50.0 10.0       ! NLTD, NVTD
+0.5             ! APH4
+adcirc-3d-baroclinic-example
+North Carolina State University
+Casey Dietrich
+History: None
+https://ccht.ccee.ncsu.edu/
+Comments: None
+Host: Name
+Metric, Datum
+jcdietrich@ncsu.edu
+2000-01-01 00:00:00 UTC
+&baroclinic3D iterateEqnState2=.FALSE., densityIntegration='trapezoidal', verticalInterpolationScheme='linear', useLeithViscosity=.FALSE., lambdaLeith=2.5, viscosityOperator='Laplacian', diffusionOperator='Laplacian', useAdaptiveFilter=.FALSE., outputFort48=.TRUE. /
