@@ -836,11 +836,12 @@ tests:
     model: adcirc
     parallel: true
     ncpu: 4 
-    geographic: true 
+    geographic: false
     global: false 
     output_files: 
       - fort.44.nc 
       - fort.45.nc 
+      - fort.46.nc 
       - fort.48.nc 
       - fort.63.nc 
       - fort.64.nc 
