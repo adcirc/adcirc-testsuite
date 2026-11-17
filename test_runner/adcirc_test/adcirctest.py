@@ -1130,6 +1130,7 @@ class AdcircTest:
             dpi=300,
             bbox_inches="tight",
         )
+        plt.close(fig)
 
         if is_global:
             fig, ax = plt.subplots(figsize=(10, 8), subplot_kw={'projection': ccrs.Robinson()})
@@ -1454,6 +1455,10 @@ class AdcircTest:
         """
         Get a masked triangulation based on the data
 
+        Elements with a NaN at any of their nodes are masked in addition to
+        any elements the triangulation already masks, such as the elements
+        that cross the antimeridian on a global mesh.
+
         Args:
             t: Triangulation
             data: Data
@@ -1461,10 +1466,8 @@ class AdcircTest:
         Returns:
             Masked triangulation
         """
-        masked_nodes = np.where(np.isnan(data))[0]
-        mask = np.full(t.triangles.shape[0], False)
-        for i in range(t.triangles.shape[0]):
-            if np.any(np.isin(t.triangles[i, :], masked_nodes)):
-                mask[i] = True
+        mask = np.isnan(data)[t.triangles].any(axis=1)
+        if t.mask is not None:
+            mask |= t.mask
         return Triangulation(t.x, t.y, t.triangles, mask=mask)
 
