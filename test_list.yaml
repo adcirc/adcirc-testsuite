@@ -862,3 +862,82 @@ tests:
       - maxele.63.nc 
       - maxvel.63.nc 
 
+  adcirc_quarterannular-2d-hotstart-harmonic:
+    path: adcirc/adcirc_quarterannular-2d-hotstart-harmonic
+    model: adcirc
+    parallel: false
+    hotstart: true
+    output_files:
+    - fort.61
+    - fort.62
+    - fort.63
+    - fort.64
+    - maxele.63
+    - maxvel.63
+    hotstart_output_files:
+    - fort.51
+    - fort.53
+  adcirc_quarterannular-2d-parallel-netcdf-hotstart-harmonic:
+    path: adcirc/adcirc_quarterannular-2d-parallel-netcdf-hotstart-harmonic
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    hotstart: true
+    output_files:
+    - fort.61.nc
+    - fort.62.nc
+    - fort.63.nc
+    - fort.64.nc
+    - maxele.63.nc
+    - maxvel.63.nc
+    hotstart_output_files:
+    - fort.51.nc
+    - fort.53.nc
+  adcirc_basin-3d-parallel-hotstart:
+    path: adcirc/adcirc_basin-3d-parallel-hotstart
+    model: adcirc
+    parallel: true
+    ncpu: 4
+    geographic: false
+    global: false
+    output_files:
+    - fort.44.nc
+    - fort.45.nc
+    - fort.46.nc
+    - fort.48.nc
+    - fort.63.nc
+    - fort.64.nc
+    - maxele.63.nc
+    - maxvel.63.nc
+    hotstart: true
+  adcirc_basin-3d-hotstart:
+    path: adcirc/adcirc_basin-3d-hotstart
+    model: adcirc
+    parallel: false
+    geographic: false
+    global: false
+    output_files:
+    - fort.44.nc
+    - fort.45.nc
+    - fort.46.nc
+    - fort.48.nc
+    - fort.63.nc
+    - fort.64.nc
+    - maxele.63.nc
+    - maxvel.63.nc
+    hotstart: true
+  adcirc_quarterannular-2d-xdmf:
+    path: adcirc/adcirc_quarterannular-2d-xdmf
+    model: adcirc
+    parallel: false
+    hotstart: false
+    expected_files:
+    - fort.63.xmf
+    - fort.63.h5
+    - fort.64.xmf
+    - fort.64.h5
+    output_files:
+    - fort.61
+    - fort.62
+    - maxele.63
+    - maxvel.63
