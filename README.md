@@ -45,6 +45,36 @@ the runner:
 ./RunSingleTest.sh <path/to/adcirc/build> <name_of_test> --allow-mismatch --report results.json
 ```
 
+### Creating or regenerating control solutions
+`--update-controls` runs the tests and copies each test's output files into its `control` directory instead of
+comparing them. Use it with the Intel build to create the control solutions for a new case, or to regenerate them
+after an intended change in the results:
+```
+./RunSingleTest.sh <path/to/adcirc/build> <name_of_test> --update-controls
+```
+
+### Test definitions
+Each test in `test_list.yaml` lists the files compared against the control solution in `output_files`. A test can
+also set:
+
+- `hotstart_output_files`: files compared only for the hot-start portion of a hotstart test, such as harmonic analysis
+  results when the analysis spans the hotstart.
+- `expected_files`: files the run must write but that the runner cannot compare, such as XDMF output. The test fails
+  if any of them is missing or empty.
+- `preprocess`: programs from the ADCIRC build directory to run in the test directory before the model, to generate
+  inputs. For example, to make the NWS = 20 `fort.22` from a track with `aswip`:
+  ```yaml
+  preprocess:
+    - executable: aswip
+      args: ["-w", "aswip_input.22"]
+      rename:
+        NWS_20_fort.22: fort.22
+  rm_files:
+    - fort.22
+  ```
+  `rename` moves the files a step wrote to the names the model reads, and generated files should be listed in
+  `rm_files` so they are removed before each run.
+
 ## Submitting a new case
 New cases are definitely welcomed. Anyone looking to submit a new case should follow one of the other directories as 
 an example of how a case should be constructed. Cases should exercise a feature or combination of features that is 
