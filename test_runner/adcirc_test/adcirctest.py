@@ -179,19 +179,24 @@ class AdcircTest:
                 os.remove(file_path)
                 logger.info(f"Removed file: {file_path}")
 
-    def run(self) -> dict:
+    def run(self, continue_after_mismatch: bool = False) -> dict:
         """
         Run the test
 
+        Args:
+            continue_after_mismatch: Run the hot-start portion of a hotstart
+                test even when the cold-start results do not match the
+                control solution
+
         Returns:
-            True if the test passed, False otherwise
+            Dictionary with the status of the test, overall and for each portion
         """
         status = {"overall": {"passed": False}}
 
         if "hotstart" in self.__test_yaml and self.__test_yaml["hotstart"]:
             logger.info("Starting cold-start portion of the test")
             status["coldstart"] = self.__run_test(has_hotstart=True, is_hotstart=False)
-            if not status["coldstart"]["passed"]:
+            if not status["coldstart"]["passed"] and not continue_after_mismatch:
                 return status
             self.__copy_hotstart()
             logger.info("Starting hot-start portion of the test")
