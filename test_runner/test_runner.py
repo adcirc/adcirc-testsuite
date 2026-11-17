@@ -47,6 +47,12 @@ def adcirc_testsuite_runner():
         help="Write the comparison results for each test to this JSON file",
         required=False,
     )
+    parser.add_argument(
+        "--update-controls",
+        action="store_true",
+        help="Copy each test's output files into its control directory instead of "
+        "comparing them, to create or regenerate the control solutions",
+    )
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
 
     args = parser.parse_args()
@@ -87,7 +93,13 @@ def adcirc_testsuite_runner():
 
             test_data = all_test_info["tests"][test_name]
             this_test = AdcircTest(
-                test_name, test_data, args.bin, args.test_root, args.tolerance, args.verbose
+                test_name,
+                test_data,
+                args.bin,
+                args.test_root,
+                args.tolerance,
+                args.verbose,
+                update_controls=args.update_controls,
             )
 
             this_test.clean()

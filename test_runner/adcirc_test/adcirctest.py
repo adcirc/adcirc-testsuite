@@ -37,6 +37,7 @@ class AdcircTest:
         root_dir: str,
         tolerance: float,
         verbose: bool = False,
+        update_controls: bool = False,
     ):
         """
         Initialize the AdcircTest object
@@ -48,6 +49,8 @@ class AdcircTest:
             root_dir: Root directory for the tests
             tolerance: Tolerance for the test results
             verbose: Verbose output
+            update_controls: Copy the outputs into control/ instead of
+                comparing them, to create or regenerate the control solutions
         """
 
         if verbose:
@@ -57,6 +60,7 @@ class AdcircTest:
 
         self.__bin = binary_directory
         self.__tolerance = tolerance
+        self.__update_controls = update_controls
         self.__test = test
         self.__test_yaml = test_yaml
         self.__root_dir = root_dir
@@ -172,7 +176,11 @@ class AdcircTest:
                     os.remove(file_path)
                     logger.info(f"Removed file: {file_path}")
 
-        for file in self.__test_yaml["output_files"]:
+        for file in (
+            self.__test_yaml["output_files"]
+            + self.__test_yaml.get("hotstart_output_files", [])
+            + self.__test_yaml.get("expected_files", [])
+        ):
             file_path = os.path.join(test_directory, file)
             logger.debug(f"Checking for file: {file_path}")
             if os.path.exists(file_path):
@@ -266,6 +274,9 @@ class AdcircTest:
             # Change to the test directory
             os.chdir(test_directory)
 
+            # Generate inputs with the ADCIRC utilities (e.g. aswip) before the run
+            self.__run_preprocess_steps()
+
             # If the test is parallel, we need to run adcprep
             if self.__test_yaml["parallel"]:
                 self.__prep_simulation()
@@ -277,10 +288,10 @@ class AdcircTest:
             )
 
             if self.__test_yaml["parallel"]:
-                if "n_writer" in self.__test_yaml:
-                    total_cpu = self.__test_yaml["ncpu"] + self.__test_yaml["n_writer"]
-                else:
-                    total_cpu = self.__test_yaml["ncpu"]
+                # Output writer processors (-W) are in addition to the
+                # compute processors
+                n_writer = self.__test_yaml.get("n_writer", 0)
+                total_cpu = self.__test_yaml["ncpu"] + n_writer
 
                 cmd = [
                     "mpirun",
@@ -289,8 +300,8 @@ class AdcircTest:
                     "{:d}".format(total_cpu),
                     self.__executable,
                 ]
-                if "n_writer" in self.__test_yaml and self.__test_yaml["n_writer"] > 0:
-                    cmd += ["-W", "{:d}".format(self.__test_yaml["n_writer"])]
+                if n_writer > 0:
+                    cmd += ["-W", "{:d}".format(n_writer)]
             else:
                 cmd = self.__executable
 
@@ -340,12 +351,101 @@ class AdcircTest:
 
             progress_bar.close()
 
+            # Outputs the runner cannot compare (e.g. XDMF) must still be written
+            for file in self.__test_yaml.get("expected_files", []):
+                if not os.path.exists(file) or os.path.getsize(file) == 0:
+                    msg = f"Expected output file {os.path.join(test_directory, file)} was not written"
+                    raise FileNotFoundError(msg)
+
         finally:
             # Change back to the original directory
             os.chdir(cwd)
 
+        if self.__update_controls:
+            self.__update_control_files(has_hotstart, is_hotstart)
+            return {"complete": True, "passed": True, "failed_files": []}
+
         passed, failed_files = self.check_results(has_hotstart, is_hotstart)
         return {"complete": True, "passed": passed, "failed_files": failed_files}
+
+    def __update_control_files(self, has_hotstart: bool, is_hotstart: bool) -> None:
+        """
+        Copy this run's output files into the control directory
+
+        Args:
+            has_hotstart: If the test has a hotstart
+            is_hotstart: If the test is a hotstart
+
+        Returns:
+            None
+        """
+        import os
+        import shutil
+
+        test_directory = self.__get_test_directory(has_hotstart, is_hotstart)
+        control_directory = os.path.join(test_directory, "control")
+        os.makedirs(control_directory, exist_ok=True)
+
+        files = list(self.__test_yaml["output_files"])
+        if is_hotstart:
+            files += self.__test_yaml.get("hotstart_output_files", [])
+
+        for file in files:
+            test_file = os.path.join(test_directory, file)
+            if not os.path.exists(test_file):
+                msg = f"Test file {test_file} does not exist"
+                raise FileNotFoundError(msg)
+            shutil.copy(test_file, os.path.join(control_directory, file))
+            logger.info(f"Updated control file: {os.path.join(control_directory, file)}")
+
+    def __run_preprocess_steps(self) -> None:
+        """
+        Run the preprocessing steps listed under "preprocess" in the test
+        yaml, in the current (test) directory. Each step runs an executable
+        from the ADCIRC build directory, for example:
+
+            preprocess:
+              - executable: aswip
+                args: ["-w", "aswip_input.22"]
+                rename:
+                  NWS_20_fort.22: fort.22
+
+        "rename" moves files the step wrote to the names the model reads.
+        Generated files should also be listed in rm_files.
+
+        Returns:
+            None
+        """
+        import os
+        import subprocess
+
+        for step in self.__test_yaml.get("preprocess", []):
+            executable = os.path.abspath(os.path.join(self.__bin, step["executable"]))
+            if not os.path.exists(executable):
+                msg = f"Preprocessing executable {executable} does not exist"
+                raise FileNotFoundError(msg)
+
+            cmd = [executable] + [str(a) for a in step.get("args", [])]
+            logger.info(f"Running preprocessing step: {' '.join(cmd)}")
+            ret = subprocess.run(
+                cmd,
+                shell=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True,
+            )
+            with open(f"preprocess_{step['executable']}.log", "w") as log:
+                log.write(ret.stdout)
+            if ret.returncode != 0:
+                msg = f"Preprocessing step {step['executable']} failed with return code: {ret.returncode}"
+                raise RuntimeError(msg)
+
+            for source, destination in step.get("rename", {}).items():
+                if not os.path.exists(source):
+                    msg = f"Preprocessing step {step['executable']} did not write {source}"
+                    raise FileNotFoundError(msg)
+                os.replace(source, destination)
+                logger.info(f"Renamed {source} to {destination}")
 
     def __prep_simulation(self) -> None:
         """
@@ -431,7 +531,13 @@ class AdcircTest:
 
         test_directory = self.__get_test_directory(has_hotstart, is_hotstart)
 
-        for file in self.__test_yaml["output_files"]:
+        # Files such as harmonic analysis results that only the hot-start
+        # portion writes are listed in hotstart_output_files
+        files = list(self.__test_yaml["output_files"])
+        if is_hotstart:
+            files += self.__test_yaml.get("hotstart_output_files", [])
+
+        for file in files:
 
             logger.info(f"Checking file: {file}")
 
