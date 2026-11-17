@@ -1026,8 +1026,7 @@ name@instit.edu
 2016-09-16 00:00:00 UTC
 &metControl
 WindDragLimit = 0.0025,
-PRBCKGRND = 1013,
-DragLawString = default,
+DragLawString = 'default',
 outputWindDrag = F,
 invertedBarometerOnElevationBoundary = F,
 /

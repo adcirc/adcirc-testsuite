@@ -1095,7 +1095,7 @@ name@instit.edu
 ! -- Begin met Control Namelist -- 
 &metControl
 WindDragLimit = 2.500000e-03,
-DragLawString = default,
+DragLawString = 'default',
 outputWindDrag = F,
 invertedBarometerOnElevationBoundary = F,
 /
