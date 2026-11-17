@@ -801,6 +801,13 @@ tests:
     hotstart: false
     geographic: true
     global: false
+    preprocess:
+      - executable: aswip
+        args: ["-w", "aswip_input.22"]
+        rename:
+          NWS_20_fort.22: fort.22
+    rm_files:
+      - fort.22
     output_files:
       - fort.63
       - fort.64
@@ -820,6 +827,13 @@ tests:
     hotstart: false
     geographic: true
     global: false
+    preprocess:
+      - executable: aswip
+        args: ["-w", "aswip_input.22"]
+        rename:
+          NWS_20_fort.22: fort.22
+    rm_files:
+      - fort.22
     output_files:
       - fort.63.nc
       - fort.64.nc
