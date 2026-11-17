@@ -89,17 +89,16 @@ cblakely@nd.edu
 ! -- Begin met Control Namelist -- 
 &metControl
 WindDragLimit = 0.0025,
-PRBCKGRND = 1013,
-DragLawString = default,
+DragLawString = 'default',
 outputWindDrag = F,
 invertedBarometerOnElevationBoundary = F,
 /
 ! -- End met Control Namelist -- 
 ! -- Begin density Control Namelist -- 
 &densityControl
-densityRunType = prognostic,
-densityForcingType = BCForcingOnADCIRCGrid,
-densityFileName = fort.11.nc,
+densityRunType = 'prognostic',
+densityForcingType = 'BCForcingOnADCIRCGrid',
+densityFileName = 'fort.11.nc',
 densityTimeIterator = 1,
 /
 ! -- End density Control Namelist -- 

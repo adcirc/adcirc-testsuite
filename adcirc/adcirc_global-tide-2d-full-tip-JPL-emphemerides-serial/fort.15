@@ -74,7 +74,7 @@ wpringle@nd.edu
 2018-01-01 00:00:00
 &metControl
 WindDragLimit = 2.500000e-03,
-DragLawString = default,
+DragLawString = 'default',
 outputWindDrag = F,
 invertedBarometerOnElevationBoundary = F,
 /
