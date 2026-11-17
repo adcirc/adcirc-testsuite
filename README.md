@@ -34,6 +34,17 @@ python3 test_runner/test_runner.py --test <name_of_test> --bin <path/to/adcirc/b
 Note that the default testing tolerance is 0.00001. This can be adjusted by changing the `--tolerance` flag. It may be
 useful to do so depending on your build settings and compiler. 
 
+### Builds that are not expected to match
+The control solutions are generated with the Intel compilers. Some builds, such as the gfortran build used to collect
+code coverage, are not expected to match them. For those, `--allow-mismatch` runs the tests and reports any
+differences from the control solutions as warnings instead of failures, and always runs both portions of a hotstart
+test. A model that fails to run, or an output file that is missing, is still a failure. `--report <file>` writes the
+comparison results for each test to a JSON file. With `RunSingleTest.sh`, arguments after the test name are passed to
+the runner:
+```
+./RunSingleTest.sh <path/to/adcirc/build> <name_of_test> --allow-mismatch --report results.json
+```
+
 ## Submitting a new case
 New cases are definitely welcomed. Anyone looking to submit a new case should follow one of the other directories as 
 an example of how a case should be constructed. Cases should exercise a feature or combination of features that is 

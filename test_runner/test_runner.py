@@ -33,6 +33,20 @@ def adcirc_testsuite_runner():
     parser.add_argument(
         "--continue-on-failure", action="store_true", help="Continue on failure"
     )
+    parser.add_argument(
+        "--allow-mismatch",
+        action="store_true",
+        help="Report results that do not match the control solution without failing, "
+        "for builds that are not expected to match it, such as a coverage build with "
+        "a different compiler. Both portions of a hotstart test are always run. A "
+        "model that fails to run or a missing output file is still a failure.",
+    )
+    parser.add_argument(
+        "--report",
+        type=str,
+        help="Write the comparison results for each test to this JSON file",
+        required=False,
+    )
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
 
     args = parser.parse_args()
@@ -62,28 +76,44 @@ def adcirc_testsuite_runner():
         test_list.append(args.test)
 
     any_failure = False
-    for i, test_name in enumerate(test_list):
+    report = {}
+    try:
+        for i, test_name in enumerate(test_list):
 
-        if len(test_list) > 1:
-            logger.info(f"Running test {i+1} of {len(test_list)}: {test_name}")
-        else:
-            logger.info(f"Running test: {test_name}")
-
-        test_data = all_test_info["tests"][test_name]
-        this_test = AdcircTest(
-            test_name, test_data, args.bin, args.test_root, args.tolerance, args.verbose
-        )
-
-        this_test.clean()
-        status = this_test.run()
-        this_test.plot(status)
-        if not status["overall"]["passed"]:
-            any_failure = True
-            msg = f"Test {test_name} failed"
-            if not args.continue_on_failure:
-                raise ValueError(msg)
+            if len(test_list) > 1:
+                logger.info(f"Running test {i+1} of {len(test_list)}: {test_name}")
             else:
-                logger.error(msg)
+                logger.info(f"Running test: {test_name}")
+
+            test_data = all_test_info["tests"][test_name]
+            this_test = AdcircTest(
+                test_name, test_data, args.bin, args.test_root, args.tolerance, args.verbose
+            )
+
+            this_test.clean()
+            status = this_test.run(continue_after_mismatch=args.allow_mismatch)
+            report[test_name] = status
+            this_test.plot(status)
+            if not status["overall"]["passed"]:
+                if args.allow_mismatch:
+                    logger.warning(
+                        f"Test {test_name} does not match the control solution. "
+                        "This is not a failure because --allow-mismatch is set."
+                    )
+                    continue
+                any_failure = True
+                msg = f"Test {test_name} failed"
+                if not args.continue_on_failure:
+                    raise ValueError(msg)
+                else:
+                    logger.error(msg)
+    finally:
+        # Written even when a test raises, so the results up to that point are kept
+        if args.report:
+            import json
+
+            with open(args.report, "w") as f:
+                json.dump(report, f, indent=2)
 
     if any_failure:
         raise ValueError("One or more tests failed")

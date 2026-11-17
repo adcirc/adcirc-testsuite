@@ -9,6 +9,10 @@ adcirc_path=$1
 #...Path to case
 case=$2
 
+#...Any further arguments (e.g. --allow-mismatch --report <file>) are
+#   passed to the test runner
+shift 2
+
 #...Current home location
 TESTHOME=$(pwd)
 
@@ -18,4 +22,4 @@ python3 $TESTHOME/test_runner/test_runner.py \
     --tolerance $err \
     --test-root $TESTHOME \
     --test-yaml $TESTHOME/test_list.yaml \
-    --test $case
+    --test $case "$@"
