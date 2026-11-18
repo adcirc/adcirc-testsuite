@@ -968,26 +968,44 @@ class AdcircTest:
             if status["coldstart"]["complete"]:
                 logger.info("Plotting cold-start results")
                 self.__plot_simulation(coldstart_directory)
-            if status["coldstart"]["passed"] and status["hotstart"]["complete"]:
+            if "hotstart" in status and status["hotstart"]["complete"]:
                 logger.info("Plotting hot-start results")
-                self.__plot_simulation(hotstart_directory)
+                self.__plot_simulation(hotstart_directory, is_hotstart=True)
         else:
             if status["coldstart"]["complete"]:
                 logger.info("Plotting test results")
                 test_directory = self.__get_test_directory(False, False)
                 self.__plot_simulation(test_directory)
 
-    def __plot_simulation(self, test_directory: str) -> None:
+    def __plot_simulation(self, test_directory: str, is_hotstart: bool = False) -> None:
         """
         Plot the simulation results in the test directory
 
         Args:
             test_directory: Test directory to plot the results
+            is_hotstart: If this is the hot-start portion of a hotstart test,
+                whose hotstart_output_files are plotted too
         """
         import os
 
-        for file in self.__test_yaml["output_files"]:
-            if "max" in file or "min" in file:
+        files = list(self.__test_yaml["output_files"])
+        if is_hotstart:
+            files += self.__test_yaml.get("hotstart_output_files", [])
+
+        for file in files:
+            if file.split(".")[1] in ("51", "52", "53", "54"):
+                test_file = os.path.join(test_directory, file)
+                control_file = os.path.join(test_directory, "control", file)
+                AdcircTest.plot_harmonic_files(
+                    self.__test,
+                    os.path.join(test_directory, "fort.14"),
+                    test_file,
+                    control_file,
+                    test_directory,
+                    self.__is_geographic,
+                    self.__is_global,
+                )
+            elif "max" in file or "min" in file:
                 mesh_file = os.path.join(test_directory, "fort.14")
                 test_file = os.path.join(test_directory, file)
                 control_file = os.path.join(test_directory, "control", file)
@@ -1071,41 +1089,12 @@ class AdcircTest:
             control_data[var].to_numpy()[0, :, 0] - test_data[var].to_numpy()[0, :, 0]
         )
 
-        # Compute the value of the 95th percentile difference
-        max_diff = np.nanmax(np.abs(diff))
-        max_val = np.nanmax(test_data[var].to_numpy()[0, :, 0])
-        min_val = np.nanmin(test_data[var].to_numpy()[0, :, 0])
-
-        if max_val == min_val:
-            min_val -= 0.1
-            max_val += 0.1
-            max_95 = max_val
-            min_5 = min_val
-        else:
-            valid_points = np.where(~np.isnan(test_data[var].to_numpy()[0, :, 0]))
-            valid_data = test_data[var].to_numpy()[0, :, 0][valid_points]
-            max_95 = np.nanpercentile(valid_data, 95)
-            min_5 = np.nanpercentile(valid_data, 5)
-            if max_95 == min_5:
-                min_5 -= 0.1
-                max_95 += 0.1
-
-        if max_diff == 0:
-            min_percentile_95 = -0.1
-            max_percentile_95 = 0.1
-        else:
-            valid_points = np.where(~np.isnan(diff))
-            valid_diff = diff[valid_points]
-            percentile_95 = np.nanpercentile(valid_diff, 95)
-            if percentile_95 == 0.0:
-                percentile_95 = 0.1
-            min_percentile_95 = min(percentile_95,-percentile_95)
-            max_percentile_95 = max(percentile_95,-percentile_95)
-
-        diff_contour_levels = np.linspace(min_percentile_95, max_percentile_95, 100)
-        diff_ticks = np.linspace(min_percentile_95, max_percentile_95, 11)
-        contour_levels = np.linspace(min_5, max_95, 100)
-        contour_ticks = np.linspace(min_5, max_95, 11)
+        (
+            contour_levels,
+            contour_ticks,
+            diff_contour_levels,
+            diff_ticks,
+        ) = AdcircTest.__contour_levels(test_data[var].to_numpy()[0, :, 0], diff)
 
         if is_geographic:
             AdcircTest.__plot_maps_geographic(
@@ -1138,6 +1127,250 @@ class AdcircTest:
                 diff_ticks,
                 output_directory,
             )
+
+    @staticmethod
+    def __contour_levels(
+        values: np.ndarray, diff: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Contour levels and ticks for a field and its difference from the
+        control, from the 5th to 95th percentile of the field and symmetric
+        about zero at the 95th percentile of the difference
+
+        Args:
+            values: Field values
+            diff: Difference between the control and test values
+
+        Returns:
+            Tuple of (contour levels, contour ticks, difference contour
+            levels, difference ticks)
+        """
+        max_diff = np.nanmax(np.abs(diff))
+        max_val = np.nanmax(values)
+        min_val = np.nanmin(values)
+
+        if max_val == min_val:
+            min_val -= 0.1
+            max_val += 0.1
+            max_95 = max_val
+            min_5 = min_val
+        else:
+            valid_data = values[~np.isnan(values)]
+            max_95 = np.nanpercentile(valid_data, 95)
+            min_5 = np.nanpercentile(valid_data, 5)
+            if max_95 == min_5:
+                min_5 -= 0.1
+                max_95 += 0.1
+
+        if max_diff == 0:
+            min_percentile_95 = -0.1
+            max_percentile_95 = 0.1
+        else:
+            valid_diff = diff[~np.isnan(diff)]
+            percentile_95 = np.nanpercentile(valid_diff, 95)
+            if percentile_95 == 0.0:
+                percentile_95 = 0.1
+            min_percentile_95 = min(percentile_95, -percentile_95)
+            max_percentile_95 = max(percentile_95, -percentile_95)
+
+        return (
+            np.linspace(min_5, max_95, 100),
+            np.linspace(min_5, max_95, 11),
+            np.linspace(min_percentile_95, max_percentile_95, 100),
+            np.linspace(min_percentile_95, max_percentile_95, 11),
+        )
+
+    @staticmethod
+    def __read_mesh(mesh_file: str) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Read the node coordinates and (1-based) element table of a fort.14
+
+        Args:
+            mesh_file: Mesh file
+
+        Returns:
+            Tuple of (x, y, element)
+        """
+        with open(mesh_file) as f:
+            f.readline()
+            element_count, node_count = (int(v) for v in f.readline().split()[:2])
+            nodes = np.array(
+                [[float(v) for v in f.readline().split()[1:3]] for _ in range(node_count)]
+            )
+            element = np.array(
+                [[int(v) for v in f.readline().split()[2:5]] for _ in range(element_count)]
+            )
+        return nodes[:, 0], nodes[:, 1], element
+
+    # Labels for the harmonic amplitude fields, by netCDF variable name, and
+    # by the position of the amplitude among an ascii line's values
+    HARMONIC_AMPLITUDE_LABELS: ClassVar[dict] = {
+        "amp": "elevation_amplitude",
+        "u_amp": "u_velocity_amplitude",
+        "v_amp": "v_velocity_amplitude",
+        "u-vel-amp": "u_velocity_amplitude",
+        "v-vel-amp": "v_velocity_amplitude",
+    }
+
+    @staticmethod
+    def __read_harmonic_amplitudes(file: str) -> Tuple[list, dict]:
+        """
+        Read the harmonic amplitudes from an ascii or netCDF harmonic analysis
+        file (fort.51, 52, 53, or 54)
+
+        Args:
+            file: Name of the file
+
+        Returns:
+            Tuple of (constituent names, dictionary of amplitude label to an
+            array of shape (stations or nodes, constituents))
+        """
+        if file.endswith(".nc"):
+            with xr.open_dataset(file, decode_times=False) as ds:
+                names = [
+                    (c.decode() if isinstance(c, bytes) else str(c)).strip()
+                    for c in ds["const"].values
+                ]
+                fields = {
+                    AdcircTest.HARMONIC_AMPLITUDE_LABELS[v]: ds[v].to_numpy()
+                    for v in ds.data_vars
+                    if v in AdcircTest.HARMONIC_AMPLITUDE_LABELS
+                }
+            return names, fields
+
+        names, values = AdcircTest.__read_harmonic_ascii(file)
+        if values.shape[2] == 2:
+            fields = {"elevation_amplitude": values[:, :, 0]}
+        else:
+            fields = {
+                "u_velocity_amplitude": values[:, :, 0],
+                "v_velocity_amplitude": values[:, :, 2],
+            }
+        return names, fields
+
+    @staticmethod
+    def plot_harmonic_files(
+        test_name: str,
+        mesh_file: str,
+        test_file: str,
+        control_file: str,
+        output_directory: str,
+        is_geographic: bool,
+        is_global: bool,
+    ) -> None:
+        """
+        Plot the harmonic analysis amplitudes and their difference from the
+        control solution for each constituent. Fulldomain results (fort.53,
+        fort.54) are mapped; station results (fort.51, fort.52) are plotted
+        by station.
+
+        Args:
+            test_name: Name of the test
+            mesh_file: Name of the mesh file, used for ascii fulldomain files
+            test_file: Name of the test file
+            control_file: Name of the control file
+            output_directory: Directory to output the plots
+            is_geographic: If the mesh is in geographic coordinates
+            is_global: If the mesh is global
+
+        Returns:
+            None
+        """
+        import os
+        import matplotlib.pyplot as plt
+
+        logger.info(f"Plotting harmonic amplitudes for file: {test_file}")
+
+        names, test_fields = AdcircTest.__read_harmonic_amplitudes(test_file)
+        _, control_fields = AdcircTest.__read_harmonic_amplitudes(control_file)
+        fulldomain = os.path.basename(test_file).split(".")[1] in ("53", "54")
+
+        if fulldomain:
+            if test_file.endswith(".nc"):
+                with xr.open_dataset(test_file, decode_times=False) as ds:
+                    x = ds["x"].to_numpy()
+                    y = ds["y"].to_numpy()
+                    element = ds["element"].to_numpy()
+            else:
+                x, y, element = AdcircTest.__read_mesh(mesh_file)
+
+        for label, test_values in test_fields.items():
+            control_values = control_fields[label]
+            for j, name in enumerate(names):
+                var = f"{name}_{label}"
+                test_amp = test_values[:, j]
+                control_amp = control_values[:, j]
+                diff = control_amp - test_amp
+
+                if not fulldomain:
+                    stations = np.arange(1, test_amp.size + 1)
+                    fig, (ax, ax_diff) = plt.subplots(2, 1, sharex=True)
+                    ax.plot(stations, control_amp, "o", label="Control")
+                    ax.plot(stations, test_amp, "x", label="Test")
+                    ax.set_ylabel("Amplitude")
+                    ax.legend()
+                    ax.grid(True)
+                    ax.set_title(f"Test: {test_name}\n{var}", fontsize=10)
+                    ax_diff.plot(stations, diff, "o")
+                    ax_diff.set_xticks(stations)
+                    ax_diff.set_xlabel("Station")
+                    ax_diff.set_ylabel("Control - Test")
+                    ax_diff.grid(True)
+                    plt.savefig(
+                        os.path.join(output_directory, f"harmonic_{var}_stations.png")
+                    )
+                    plt.close(fig)
+                    continue
+
+                fig, ax = plt.subplots()
+                ax.hist(np.abs(diff), bins=100)
+                ax.set_xlabel("Absolute Difference")
+                ax.set_ylabel("Frequency")
+                ax.grid(True)
+                ax.set_title(f"Test: {test_name}, Difference for {var}")
+                plt.savefig(
+                    os.path.join(output_directory, f"harmonic_diff_{var}_histogram.png")
+                )
+                plt.close(fig)
+
+                # The map plotters read the field as [time, node, value]
+                def dataset(values: np.ndarray) -> xr.Dataset:
+                    return xr.Dataset(
+                        {
+                            "x": ("node", x),
+                            "y": ("node", y),
+                            "element": (("nele", "nvertex"), element),
+                            var: (("time", "node", "value"), values[None, :, None]),
+                        }
+                    )
+
+                test_data, control_data = dataset(test_amp), dataset(control_amp)
+                levels = AdcircTest.__contour_levels(test_amp, diff)
+                if is_geographic:
+                    AdcircTest.__plot_maps_geographic(
+                        test_name,
+                        x,
+                        y,
+                        test_data,
+                        control_data,
+                        diff,
+                        var,
+                        *levels,
+                        output_directory,
+                        is_global,
+                    )
+                else:
+                    AdcircTest.__plot_data_cartesian(
+                        test_name,
+                        var,
+                        x,
+                        y,
+                        test_data,
+                        control_data,
+                        diff,
+                        *levels,
+                        output_directory,
+                    )
 
     @staticmethod
     def __plot_data_cartesian(
