@@ -579,10 +579,110 @@ class AdcircTest:
         Returns:
             True if the files match within spec, False otherwise
         """
+        import os
+
         if control_file.endswith(".nc") and test_file.endswith(".nc"):
             return AdcircTest.__compare_files_netcdf(control_file, test_file, tolerance)
+        elif os.path.basename(control_file) in AdcircTest.ASCII_HARMONIC_FILES:
+            return AdcircTest.__compare_files_harmonic_ascii(
+                control_file, test_file, tolerance
+            )
         else:
             return AdcircTest.__compare_files_ascii(control_file, test_file, tolerance)
+
+    # Harmonic analysis results, which have a different layout from the
+    # time series files
+    ASCII_HARMONIC_FILES = ("fort.51", "fort.52", "fort.53", "fort.54")
+
+    @staticmethod
+    def __read_harmonic_ascii(file: str) -> Tuple[list, np.ndarray]:
+        """
+        Read an ascii harmonic analysis file (fort.51, 52, 53, or 54)
+
+        The file lists the number of constituents, one line per constituent
+        (frequency, nodal factor, equilibrium argument, name), the number of
+        stations or nodes, and then for each one its number followed by a
+        line per constituent of amplitude and phase pairs (one pair for
+        elevation, two for velocity).
+
+        Args:
+            file: Name of the file
+
+        Returns:
+            Tuple of (constituent names, array of shape
+            (stations or nodes, constituents, values per line))
+        """
+        with open(file) as f:
+            lines = [line.split() for line in f if line.strip()]
+
+        n_constituents = int(lines[0][0])
+        names = [line[-1] for line in lines[1 : 1 + n_constituents]]
+        n_locations = int(lines[1 + n_constituents][0])
+
+        values = []
+        position = 2 + n_constituents
+        for _ in range(n_locations):
+            position += 1  # station or node number
+            for _ in range(n_constituents):
+                values.append([float(v) for v in lines[position]])
+                position += 1
+
+        return names, np.array(values).reshape(n_locations, n_constituents, -1)
+
+    @staticmethod
+    def __compare_files_harmonic_ascii(
+        control_file: str, test_file: str, tolerance: float
+    ) -> bool:
+        """
+        Compare ascii harmonic analysis files
+
+        Amplitudes are compared within the tolerance. Phases (in degrees) are
+        compared by their difference modulo 360, and only where the control
+        amplitude exceeds the tolerance, since the phase of a zero amplitude
+        is roundoff noise.
+
+        Args:
+            control_file: Name of the control file
+            test_file: Name of the test file
+            tolerance: Tolerance for the comparison
+
+        Returns:
+            True if the files match within spec, False otherwise
+        """
+        control_names, control = AdcircTest.__read_harmonic_ascii(control_file)
+        test_names, test = AdcircTest.__read_harmonic_ascii(test_file)
+
+        if control_names != test_names or control.shape != test.shape:
+            logger.error(
+                f"Harmonic analysis files differ in constituents or size: "
+                f"{control_names} {control.shape} vs {test_names} {test.shape}"
+            )
+            return False
+
+        amplitude_control, amplitude_test = control[..., 0::2], test[..., 0::2]
+        phase_control, phase_test = control[..., 1::2], test[..., 1::2]
+
+        passed = True
+        amplitude_difference = np.max(np.abs(amplitude_control - amplitude_test))
+        if amplitude_difference > tolerance:
+            logger.error(
+                f"Error in harmonic amplitude with tolerance {tolerance} and "
+                f"maximum difference: {amplitude_difference}"
+            )
+            passed = False
+
+        phase_difference = np.abs((phase_control - phase_test + 180.0) % 360.0 - 180.0)
+        significant = amplitude_control > tolerance
+        if np.any(significant):
+            max_phase_difference = np.max(phase_difference[significant])
+            if max_phase_difference > tolerance:
+                logger.error(
+                    f"Error in harmonic phase with tolerance {tolerance} and "
+                    f"maximum difference: {max_phase_difference}"
+                )
+                passed = False
+
+        return passed
 
     @staticmethod
     def __compare_files_netcdf(
